@@ -7,19 +7,19 @@ def sigmoidDerivative(x):
     return sigmoid(x) * (1 - sigmoid(x))
 
 def tanh(x):
-    pass
+    return np.tanh(x)
 
 def tanhDerivative(x):
-    pass
+    return 1 - np.power(tanhDerivative(x), 2)
 
 def relu(x):
-    pass
+    return max(0, x)
 
 def reluDerivative(x):
-    pass
+    return relu(x)
 
-def softmax(x):
-    pass
+def softplus(x):
+    return np.log(1 + np.exp(x))
 
-def softmaxDerivative(x):
-    pass
+def softplusDerivative(x):
+    return 1 / (1 + np.exp(-x))
