@@ -25,7 +25,7 @@ class NeuralNetwork:
         """
         pass
 
-    def train(self, input, expectedOutput):
+    def train(self, input, expected_output):
         """
         Performs the training phase.
 
@@ -33,7 +33,7 @@ class NeuralNetwork:
         """
         pass
 
-    def computes(self, nn_input):
+    def feedforward(self, nn_input):
         """
         Computes the new input and return the result.
 
