@@ -2,9 +2,9 @@ import numpy as np
 
 
 class Layer:
-    def __init__(self, previousNode, nodes, activationFunction):
+    def __init__(self, previousNodes, nodes, activationFunction):
         self.activationFunction = activationFunction
-        self.weights = np.zeros((nodes, previousNode))
+        self.weights = np.zeros((nodes, previousNodes))
 
     def getNodeWeights(self, node):
         return self.weights[node]

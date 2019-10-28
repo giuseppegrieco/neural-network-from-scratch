@@ -8,9 +8,13 @@ http://google.github.io/styleguide/pyguide.html
 """
 from .hyperparameters import Hyperparameters
 from .neuralNetwork import NeuralNetwork
+from .activationFunctions import sigmoid
+from .activationFunctions import relu
 
 # Import able to access:
 __all__ = [
     'Hyperparameters',
     'NeuralNetwork',
+    'sigmoid',
+    'relu'
 ]
