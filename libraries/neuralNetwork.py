@@ -9,8 +9,8 @@ class NeuralNetwork:
         """
         Inits NeuralNetwork with the hyperparameters indicated.
 
-        Attributes:
-            hyperparameters It contains all hyperparameters to use for this nn.
+        Args:
+            hyperparameters (:Hyperparameter): It contains all hyperparameters to use for this nn.
         """
         self.hyperparameters = hyperparameters
         self.__initWeights()
