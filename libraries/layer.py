@@ -1,16 +1,22 @@
+import numpy as np
+
+
 class Layer:
-    def __init__(self, nodes, activationFunction):
+    def __init__(self, previousNode, nodes, activationFunction):
         self.activationFunction = activationFunction
-        self.nodes = [None] * nodes
+        self.weights = np.zeros((nodes, previousNode))
 
-    def getWeight(self, node):
-        return self.nodes[node]
+    def getNodeWeights(self, node):
+        return self.weights[node]
 
-    def setWeight(self, node, value):
-        self.nodes[node] = value
+    def setNodeWeights(self, node, weights):
+        self.weights[node] = weights
 
-    def computes(self, previousLayer):
-        pass
+    def getWeights(self):
+        return self.weights
+
+    def computes(self, inputs):
+        return self.activationFunction(self.weights.dot(inputs))
 
     def getActivationFunction(self):
         return self.activationFunction
