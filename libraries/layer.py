@@ -1,4 +1,3 @@
-# NN Layer class
 class Layer:
     def __init__(self, nodes, activationFunction):
         self.activationFunction = activationFunction

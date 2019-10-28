@@ -1,4 +1,3 @@
-# Hyperparameters class
 class Hyperparameters:
     def __init__(self,
                  inputNodes,
