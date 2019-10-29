@@ -1,25 +1,25 @@
 import numpy as np
 
 
-class Layer:
+class _Layer:
     def __init__(self, previous_nodes, nodes, activation_function):
-        self.activation_function = activation_function
-        self.weights = np.random.rand(nodes, previous_nodes)
+        self.__activation_function = activation_function
+        self.__weights = np.random.rand(nodes, previous_nodes)
 
-    def getNodeWeights(self, node):
-        return self.weights[node]
+    def get_node_weights(self, node):
+        return self.__weights[node]
 
-    def setNodeWeights(self, node, weights):
-        self.weights[node] = weights
+    def set_node_weights(self, node, weights):
+        self.__weights[node] = weights
 
-    def getWeights(self):
-        return self.weights
+    def get_weights(self):
+        return self.__weights
 
     def computes(self, inputs):
-        return self.activation_function(self.weights.dot(inputs))
+        return self.__activation_function(self.__weights.dot(inputs))
 
-    def getActivationFunction(self):
-        return self.activation_function
+    def get_activation_function(self):
+        return self.__activation_function
 
-    def setActivationFunction(self, activation_function):
-        self.activation_function = activation_function
+    def set_activation_function(self, activation_function):
+        self.__activation_function = activation_function

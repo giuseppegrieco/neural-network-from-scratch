@@ -38,14 +38,14 @@ def tanh(x):
     return np.tanh(x)
 
 
-def tanhDerivative(x):
+def tanh_derivative(x):
     """
     Implementation of tangent's derivative
 
     Args:
         x: the point where compute the derivative
     """
-    return 1 - np.power(tanhDerivative(x), 2)
+    return 1 - np.power(tanh(x), 2)
 
 
 def relu(x):
@@ -58,7 +58,7 @@ def relu(x):
     return max(0, x)
 
 
-def reluDerivative(x):
+def relu_derivative(x):
     """
     Implementation of ReLU's derivative
 

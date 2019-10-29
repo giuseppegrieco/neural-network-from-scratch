@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class NeuralNetwork:
     """
     Artificial Neural Network implementation.
@@ -14,10 +15,10 @@ class NeuralNetwork:
         Args:
             hyperparameters (Hyperparameter): It contains all hyperparameters to use for this nn.
         """
-        self.hyperparameters = hyperparameters
-        self.__initWeights()
+        self.__hyperparameters = hyperparameters
+        self.__init_weights()
 
-    def __initWeights(self):
+    def __init_weights(self):
         """
         Computes the initial weights of the network.
 
@@ -38,13 +39,13 @@ class NeuralNetwork:
         Computes the new input and return the result.
 
         Args:
-            nnInput (numpy.array): Input gived to the neural network
+            nn_input (array): Input gived to the neural network
 
         Returns:
             Neural Network output.
         """
         nn_input = np.array(nn_input)
-        for layer in self.hyperparameters.get_hidden_layers():
+        for layer in self.__hyperparameters.get_hidden_layers():
             nn_input = layer.computes(nn_input)
 
-        return self.hyperparameters.get_output_layer().computes(nn_input)
+        return self.__hyperparameters.get_output_layer().computes(nn_input)
