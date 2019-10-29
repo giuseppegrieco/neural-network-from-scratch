@@ -23,3 +23,5 @@ class _Layer:
 
     def set_activation_function(self, activation_function):
         self.__activation_function = activation_function
+
+
