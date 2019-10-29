@@ -2,6 +2,9 @@ from layer import _Layer
 
 
 class Hyperparameters:
+    """
+    Neural Network Hyperparameters abstraction.
+    """
     def __init__(self,
                  input_nodes,
                  hidden_layers,
