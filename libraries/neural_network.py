@@ -24,15 +24,13 @@ class NeuralNetwork:
 
         TODO: write the method
         """
-        pass
 
-    def train(self, input, expected_output):
+    def train(self, input_data, expected_output):
         """
         Performs the training phase.
 
         TODO: write the method
         """
-        pass
 
     def feedforward(self, nn_input):
         """

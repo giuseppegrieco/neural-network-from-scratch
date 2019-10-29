@@ -7,9 +7,9 @@ Style Guide:
 http://google.github.io/styleguide/pyguide.html
 """
 from .hyperparameters import Hyperparameters
-from .neuralNetwork import NeuralNetwork
-from .activationFunctions import sigmoid
-from .activationFunctions import relu
+from .neural_network import NeuralNetwork
+from .activation_functions import sigmoid
+from .activation_functions import relu
 
 # Import able to access:
 __all__ = [

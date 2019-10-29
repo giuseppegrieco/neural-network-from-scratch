@@ -1,11 +1,9 @@
-import numpy as np
-
 """
-  The follow functions provide an implementation for activation 
-  function of a node.
-  
+  The follow functions provide an implementation for activation function of a node.
+
   see https://en.wikipedia.org/wiki/Activation_function
 """
+import numpy as np
 
 
 def sigmoid(x):
@@ -18,7 +16,7 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
-def sigmoidDerivative(x):
+def sigmoid_derivative(x):
     """
     Implementation of sigmoid's derivative
 
@@ -78,7 +76,7 @@ def softplus(x):
     return np.log(1 + np.exp(x))
 
 
-def softplusDerivative(x):
+def softplus_derivative(x):
     """
     Implementation of SoftPlus's derivative
 
