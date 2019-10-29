@@ -1,6 +1,5 @@
 from layer import _Layer
 
-
 class Hyperparameters:
     """
     Neural Network Hyperparameters abstraction.
