@@ -37,7 +37,7 @@ class NeuralNetwork:
         Computes the new input and return the result.
 
         Args:
-            nn_input (array): Input gived to the neural network
+            nn_input (list[int]): Input gived to the neural network
 
         Returns:
             Neural Network output.
