@@ -45,22 +45,19 @@ class NeuralNetwork:
         for l in range(len(layers) - 1, 0, -1):
             current_net = layers[l].get_net()
             current_activation_function_derivative = layers[l].get_activation_function_derivative()
-
             delta = delta * current_activation_function_derivative(
                 current_net
             )
-
-            delta_w = np.mat(layers[l-1].get_last_output()).T * np.mat(delta)
-            print(layers[l].get_weights().shape)
+            delta_w = np.mat(delta).T * np.mat(layers[l - 1].get_last_output())
             layers[l].set_weights(
                 layers[l].get_weights() + (delta_w * self.__hyperparameters.get_learning_rate())
             )
 
         current_activation_function_derivative = layers[0].get_activation_function_derivative()
-        delta_w = np.mat(delta) * np.mat(current_activation_function_derivative(
+        delta = delta * current_activation_function_derivative(
             layers[0].get_net()
-        ))
-        delta_w = np.mat(input_data).T * np.mat(delta_w)
+        )
+        delta_w = np.mat(input_data).T * np.mat(delta)
         layers[0].set_weights(
             layers[0].get_weights() + (delta_w * self.__hyperparameters.get_learning_rate())
         )

@@ -4,7 +4,7 @@ import numpy as np
 class _Layer:
     def __init__(self, previous_nodes, nodes, activation_function, activation_function_derivative):
         self.__activation_function = activation_function
-        self.__activation_function_derivative = activation_function_derivative;
+        self.__activation_function_derivative = activation_function_derivative
         self.__weights = np.random.rand(nodes, 1 + previous_nodes)
         self.__last_output = None
         self.__net = None
