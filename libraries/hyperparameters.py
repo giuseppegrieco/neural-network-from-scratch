@@ -12,7 +12,7 @@ class Hyperparameters:
         self.__input_nodes = input_nodes
         self.__hidden_layers = []
         self.set_hidden_layers(input_nodes, hidden_layers)
-        self.__output_layer = _Layer(hidden_layers[-1][0], output_layer[0], output_layer[1])
+        self.__output_layer = _Layer(hidden_layers[-1][0], output_layer[0], output_layer[1], output_layer[2])
         self.__learning_rate = learning_rate
 
     def get_input_nodes(self):
@@ -38,7 +38,7 @@ class Hyperparameters:
         previous_nodes = input_nodes
         for layer_info in hidden_layers:
             self.__hidden_layers.append(
-                _Layer(previous_nodes, layer_info[0], layer_info[1])
+                _Layer(previous_nodes, layer_info[0], layer_info[1], layer_info[2])
             )
             previous_nodes = layer_info[0]
 
