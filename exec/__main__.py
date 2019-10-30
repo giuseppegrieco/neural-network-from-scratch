@@ -5,9 +5,9 @@ hyper_parameters = ml.Hyperparameters(
      [
           [3,  ml.sigmoid, ml.sigmoid_derivative]
      ], #hidden layers
-     [1, ml.sigmoid, ml.sigmoid_derivative],  #output layer
+     [2, ml.sigmoid, ml.sigmoid_derivative],  #output layer
      0.01
 )
 
 nn = ml.NeuralNetwork(hyper_parameters)
-nn.train([2, 5], [12])
+nn.train([2, 5], [12, 53])
