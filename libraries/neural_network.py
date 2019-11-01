@@ -1,3 +1,6 @@
+"""
+    This module provide the concept of Artificial Neural Network.
+"""
 import numpy as np
 
 
@@ -9,12 +12,6 @@ class NeuralNetwork:
         hyperparameters (:Hyperparameter): It contains all hyperparameters for the nn.
     """
     def __init__(self, hyperparameters):
-        """
-        Inits NeuralNetwork with the hyperparameters indicated.
-
-        Args:
-            hyperparameters (Hyperparameter): It contains all hyperparameters to use for this nn.
-        """
         self.__hyperparameters = hyperparameters
         self.__init_weights()
 
@@ -31,26 +28,35 @@ class NeuralNetwork:
 
         TODO: write the method
         """
-        ff = self.feedforward(input_data)
-        self.backpropagation(input_data, expected_output, ff)
+        output = self.feed_forward(input_data)
+        self.__back_propagation(input_data, expected_output, output)
 
-    def backpropagation(self, input_data, target, output):
-        input_data = np.array(input_data, dtype=float)
-        target = np.array(target)
+    def __back_propagation(self, input_data, target, output):
+        """
+        Performs back-propagation.
+
+        TODO: fix the method (note output is already vector column)
+        """
+        # reshape input data as column vector
+        input_data = np.mat(np.array(input_data, dtype=float)).T
+
+        # reshape target vector as column vector
+        target = np.mat(np.array(target)).T
+
         delta = -1 * (target - output)
 
         layers = self.__hyperparameters.get_hidden_layers().copy()
         layers.append(self.__hyperparameters.get_output_layer())
 
-        for l in range(len(layers) - 1, 0, -1):
-            current_net = layers[l].get_net()
-            current_activation_function_derivative = layers[l].get_activation_function_derivative()
+        for layer_index in range(len(layers) - 1, 0, -1):
+            current_net = layers[layer_index].get_net()
+            current_activation_function_derivative = layers[layer_index].get_activation_function_derivative()
             delta = delta * current_activation_function_derivative(
                 current_net
             )
-            delta_w = np.mat(delta).T * np.mat(layers[l - 1].get_last_output())
-            layers[l].set_weights(
-                layers[l].get_weights() + (delta_w * self.__hyperparameters.get_learning_rate())
+            delta_w = np.mat(delta).T * np.mat(layers[layer_index - 1].get_last_output())
+            layers[layer_index].set_weights(
+                layers[layer_index].get_weights() + (delta_w * self.__hyperparameters.get_learning_rate())
             )
 
         current_activation_function_derivative = layers[0].get_activation_function_derivative()
@@ -62,7 +68,7 @@ class NeuralNetwork:
             layers[0].get_weights() + (delta_w * self.__hyperparameters.get_learning_rate())
         )
 
-    def feedforward(self, nn_input):
+    def feed_forward(self, nn_input):
         """
         Computes the new input and return the result.
 

@@ -1,9 +1,6 @@
 from layer import _Layer
 
 class Hyperparameters:
-    """
-    Neural Network Hyperparameters abstraction.
-    """
     def __init__(self,
                  input_nodes,
                  hidden_layers,
@@ -11,8 +8,13 @@ class Hyperparameters:
                  learning_rate):
         self.__input_nodes = input_nodes
         self.__hidden_layers = []
-        self.set_hidden_layers(input_nodes, hidden_layers)
-        self.__output_layer = _Layer(hidden_layers[-1][0], output_layer[0], output_layer[1], output_layer[2])
+        self.set_hidden_layers(hidden_layers)
+        self.__output_layer = _Layer(
+            self.__hidden_layers[-1].get_nodes(),
+            output_layer[0],
+            output_layer[1],
+            output_layer[2]
+        )
         self.__learning_rate = learning_rate
 
     def get_input_nodes(self):
@@ -33,12 +35,17 @@ class Hyperparameters:
     def set_output_layers(self, output_layers):
         self.__output_layer = output_layers
 
-    def set_hidden_layers(self, input_nodes, hidden_layers):
+    def set_hidden_layers(self, hidden_layers):
         self.__hidden_layers = []
-        previous_nodes = input_nodes
+        previous_nodes = self.__input_nodes
         for layer_info in hidden_layers:
             self.__hidden_layers.append(
-                _Layer(previous_nodes, layer_info[0], layer_info[1], layer_info[2])
+                _Layer(
+                    previous_nodes,
+                    layer_info[0],
+                    layer_info[1],
+                    layer_info[2]
+                )
             )
             previous_nodes = layer_info[0]
 
