@@ -19,7 +19,7 @@ class _Layer:
         self.__nodes = nodes
         self.__activation_function = activation_function
         self.__activation_function_derivative = activation_function_derivative
-        self.__weights = np.zeros((self.__nodes, self.__previous_nodes))
+        self.__weights = np.random.rand(self.__nodes, self.__previous_nodes)
         self.__last_output = None
         self.__net = None
 

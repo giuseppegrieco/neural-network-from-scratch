@@ -43,23 +43,44 @@ class NeuralNetwork:
         # reshape target vector as column vector
         target = np.mat(np.array(target)).T
 
-        delta = -1 * (target - output)
-
         output_layer = self.__hyperparameters.get_output_layer()
-        hidden_layer = self.__hyperparameters.get_hidden_layers()[0]
+        hidden_layers = self.__hyperparameters.get_hidden_layers()
+        first_hidden_layer = hidden_layers[-1]
+
+        # error of each output nodes
+        delta = -1 * (target - output)
 
         delta = np.multiply(delta, output_layer.get_activation_function_derivative()(
             output_layer.get_net()
         ))
-        delta_oh = delta * hidden_layer.get_last_output().T
+
+        #adjusting delta of weights between last hidden layer and the output layer
+        delta_oh = delta * first_hidden_layer.get_last_output().T
         output_layer.set_weights(output_layer.get_weights() + (delta_oh * -self.__hyperparameters.get_learning_rate()))
 
-        delta = delta.T * output_layer.get_weights()
-        delta = np.multiply(delta.T, hidden_layer.get_activation_function_derivative()(
-            hidden_layer.get_net()
+        previous_weights = output_layer.get_weights()
+        for hidden_layer_index in range(len(hidden_layers) - 1, 0, -1):
+            # TODO: forse meglio fare output_layer.get_weights().T * delta così da non trasporre due volte delta
+            delta = delta.T * previous_weights
+            delta = np.multiply(delta.T,hidden_layers[hidden_layer_index].get_activation_function_derivative()(
+                hidden_layers[hidden_layer_index].get_net()
+            ))
+            deltah_h = delta * hidden_layers[hidden_layer_index - 1].get_last_output().T
+            hidden_layers[hidden_layer_index].set_weights(
+                hidden_layers[hidden_layer_index].get_weights() +
+                deltah_h * - self.__hyperparameters.get_learning_rate()
+            )
+            previous_weights = hidden_layers[hidden_layer_index].get_weights()
+
+        #TODO: forse meglio fare output_layer.get_weights().T * delta così da non trasporre due volte delta
+        delta = delta.T * previous_weights
+        delta = np.multiply(delta.T, hidden_layers[0].get_activation_function_derivative()(
+            hidden_layers[0].get_net()
         ))
+
+        # adjusting delta of weights between last hidden layer and the output layer
         delta_hi = delta * input_data.T
-        hidden_layer.set_weights(hidden_layer.get_weights() + (delta_hi * -self.__hyperparameters.get_learning_rate()))
+        hidden_layers[0].set_weights(hidden_layers[0].get_weights() + (delta_hi * -self.__hyperparameters.get_learning_rate()))
 
     def feed_forward(self, nn_input):
         """
