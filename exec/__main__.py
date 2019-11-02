@@ -4,21 +4,20 @@ import random
 hyper_parameters = ml.Hyperparameters(
      2, #input layer
      [
-          [4,  ml.sigmoid, ml.sigmoid_derivative],
-          [3,  ml.sigmoid, ml.sigmoid_derivative]
+          [2, True,  ml.sigmoid, ml.sigmoid_derivative]
      ], #hidden layers
-     [2, ml.sigmoid, ml.sigmoid_derivative],  #output layer
-     0.1
+     [2, False, ml.sigmoid, ml.sigmoid_derivative],  #output layer
+     0.3
 )
 
 nn = ml.NeuralNetwork(hyper_parameters)
 
 # wrong way !!!!
-x = [[0,0],[1,0],[0,1],[1,1],[1,1],[1,1]]
-y = [[1,0],[1,0],[1,0],[0,1],[0,1],[0,1]]
+x = [[0,0],[1,0],[0,1],[1,1]]
+y = [[0,1],[0,1],[0,1],[1,0]]
 
-for i in range(1, 100000):
-     rand = random.randrange(5)
+for i in range(1, 2000):
+     rand = random.randrange(len(x))
      nn.train(x[rand], y[rand])
 
 

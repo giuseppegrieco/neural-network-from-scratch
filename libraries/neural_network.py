@@ -28,7 +28,9 @@ class NeuralNetwork:
 
         TODO: write the method
         """
+        #input_data = np.append(np.array([1]), input_data)
         output = self.feed_forward(input_data)
+        input_data = [1] + input_data
         self.__back_propagation(input_data, expected_output, output)
 
     def __back_propagation(self, input_data, target, output):
@@ -48,6 +50,8 @@ class NeuralNetwork:
         first_hidden_layer = hidden_layers[-1]
 
         # error of each output nodes
+
+        output = output.reshape((len(output), 1))
         delta = -1 * (target - output)
 
         delta = np.multiply(delta, output_layer.get_activation_function_derivative()(
@@ -62,6 +66,7 @@ class NeuralNetwork:
         for hidden_layer_index in range(len(hidden_layers) - 1, 0, -1):
             # TODO: forse meglio fare output_layer.get_weights().T * delta così da non trasporre due volte delta
             delta = delta.T * previous_weights
+            delta = np.delete(delta, [0])
             delta = np.multiply(delta.T,hidden_layers[hidden_layer_index].get_activation_function_derivative()(
                 hidden_layers[hidden_layer_index].get_net()
             ))
@@ -74,6 +79,7 @@ class NeuralNetwork:
 
         #TODO: forse meglio fare output_layer.get_weights().T * delta così da non trasporre due volte delta
         delta = delta.T * previous_weights
+        delta = np.delete(delta, [0])
         delta = np.multiply(delta.T, hidden_layers[0].get_activation_function_derivative()(
             hidden_layers[0].get_net()
         ))
@@ -92,6 +98,7 @@ class NeuralNetwork:
         Returns:
             Neural Network output.
         """
+        nn_input = [1] + nn_input
         nn_input = np.array(nn_input, dtype=float)
         for layer in self.__hyperparameters.get_hidden_layers():
             nn_input = layer.computes(nn_input)

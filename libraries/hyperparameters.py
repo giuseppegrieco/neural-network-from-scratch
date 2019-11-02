@@ -10,10 +10,11 @@ class Hyperparameters:
         self.__hidden_layers = []
         self.set_hidden_layers(hidden_layers)
         self.__output_layer = _Layer(
+            output_layer[1],
             self.__hidden_layers[-1].get_nodes(),
             output_layer[0],
-            output_layer[1],
-            output_layer[2]
+            output_layer[2],
+            output_layer[3]
         )
         self.__learning_rate = learning_rate
 
@@ -41,10 +42,11 @@ class Hyperparameters:
         for layer_info in hidden_layers:
             self.__hidden_layers.append(
                 _Layer(
+                    layer_info[1],
                     previous_nodes,
                     layer_info[0],
-                    layer_info[1],
-                    layer_info[2]
+                    layer_info[2],
+                    layer_info[3]
                 )
             )
             previous_nodes = self.__hidden_layers[-1].get_nodes()

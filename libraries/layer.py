@@ -14,14 +14,15 @@ class _Layer:
         activation_function (function): layer's activation function.
         activation_function_derivative (function): derivative of activation_function argument.
     """
-    def __init__(self, previous_nodes, nodes, activation_function, activation_function_derivative):
+    def __init__(self, isHidden, previous_nodes, nodes, activation_function, activation_function_derivative):
         self.__previous_nodes = previous_nodes
         self.__nodes = nodes
         self.__activation_function = activation_function
         self.__activation_function_derivative = activation_function_derivative
-        self.__weights = np.random.rand(self.__nodes, self.__previous_nodes)
+        self.__weights = np.random.rand(self.__nodes, 1 + self.__previous_nodes)
         self.__last_output = None
         self.__net = None
+        self.__isHidden = isHidden
 
     def computes(self, inputs):
         """
@@ -33,8 +34,12 @@ class _Layer:
         Returns:
             matrix: result of computing the activation function of the layer's net.
         """
+        #TODO change input's documentations
+
         # append 1 to input vector for bias and reshape as column vector
+
         inputs = inputs.reshape((len(inputs), 1))
+
 
         # performs the net of the layer
         self.__net = self.__weights.dot(
@@ -43,7 +48,9 @@ class _Layer:
 
         # calculates the output of the layer
         self.__last_output = self.__activation_function(self.__net)
-
+        if self.__isHidden:
+            self.__last_output = np.append(np.array([1]), self.__last_output)
+        self.__last_output = self.__last_output.reshape((len(self.__last_output),1))
         return self.__last_output
 
     def get_previous_nodes(self):
