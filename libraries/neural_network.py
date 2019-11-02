@@ -37,36 +37,29 @@ class NeuralNetwork:
 
         TODO: fix the method (note output is already vector column)
         """
-        # reshape input data as column vector
-        input_data = np.mat(np.array(input_data, dtype=float)).T
+        # reshape input vector as column vector
+        input_data = np.array(input_data, dtype=float).reshape((len(input_data), 1))
 
         # reshape target vector as column vector
         target = np.mat(np.array(target)).T
 
         delta = -1 * (target - output)
 
-        layers = self.__hyperparameters.get_hidden_layers().copy()
-        layers.append(self.__hyperparameters.get_output_layer())
+        output_layer = self.__hyperparameters.get_output_layer()
+        hidden_layer = self.__hyperparameters.get_hidden_layers()[0]
 
-        for layer_index in range(len(layers) - 1, 0, -1):
-            current_net = layers[layer_index].get_net()
-            current_activation_function_derivative = layers[layer_index].get_activation_function_derivative()
-            delta = delta * current_activation_function_derivative(
-                current_net
-            )
-            delta_w = np.mat(delta).T * np.mat(layers[layer_index - 1].get_last_output())
-            layers[layer_index].set_weights(
-                layers[layer_index].get_weights() + (delta_w * self.__hyperparameters.get_learning_rate())
-            )
+        delta = np.multiply(delta, output_layer.get_activation_function_derivative()(
+            output_layer.get_net()
+        ))
+        delta_oh = delta * hidden_layer.get_last_output().T
+        output_layer.set_weights(output_layer.get_weights() + (delta_oh * -self.__hyperparameters.get_learning_rate()))
 
-        current_activation_function_derivative = layers[0].get_activation_function_derivative()
-        delta = delta * current_activation_function_derivative(
-            layers[0].get_net()
-        )
-        delta_w = np.mat(input_data).T * np.mat(delta)
-        layers[0].set_weights(
-            layers[0].get_weights() + (delta_w * self.__hyperparameters.get_learning_rate())
-        )
+        delta = delta.T * output_layer.get_weights()
+        delta = np.multiply(delta.T, hidden_layer.get_activation_function_derivative()(
+            hidden_layer.get_net()
+        ))
+        delta_hi = delta * input_data.T
+        hidden_layer.set_weights(hidden_layer.get_weights() + (delta_hi * -self.__hyperparameters.get_learning_rate()))
 
     def feed_forward(self, nn_input):
         """

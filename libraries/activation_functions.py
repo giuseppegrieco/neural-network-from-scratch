@@ -23,7 +23,7 @@ def sigmoid_derivative(x):
     Args:
         x: the point where compute the derivative
     """
-    return sigmoid(x) * (1 - sigmoid(x))
+    return np.multiply(sigmoid(x), (1 - sigmoid(x)))
 
 
 def tanh(x):

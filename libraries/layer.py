@@ -19,7 +19,7 @@ class _Layer:
         self.__nodes = nodes
         self.__activation_function = activation_function
         self.__activation_function_derivative = activation_function_derivative
-        self.__weights = np.random.rand(nodes, 1 + previous_nodes)
+        self.__weights = np.zeros((self.__nodes, self.__previous_nodes))
         self.__last_output = None
         self.__net = None
 
@@ -34,7 +34,7 @@ class _Layer:
             matrix: result of computing the activation function of the layer's net.
         """
         # append 1 to input vector for bias and reshape as column vector
-        inputs = np.append(np.array([1]), inputs).reshape((1 + self.__previous_nodes, 1))
+        inputs = inputs.reshape((len(inputs), 1))
 
         # performs the net of the layer
         self.__net = self.__weights.dot(

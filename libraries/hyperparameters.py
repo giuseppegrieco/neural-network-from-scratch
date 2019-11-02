@@ -47,7 +47,7 @@ class Hyperparameters:
                     layer_info[2]
                 )
             )
-            previous_nodes = layer_info[0]
+            previous_nodes = self.__hidden_layers[-1].get_nodes()
 
     def set_learning_rate(self, learning_rate):
         self.__learning_rate = learning_rate
