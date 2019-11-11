@@ -9,7 +9,7 @@ class NeuralNetwork:
     Artificial Neural Network implementation.
 
     Attributes:
-        hyperparameters (:Hyperparameter): It contains all hyperparameters for the nn.
+        hyperparameters (libraries.Hyperparameters): It contains all hyperparameters for the nn.
     """
     def __init__(self, hyperparameters):
         self.__hyperparameters = hyperparameters
@@ -57,34 +57,35 @@ class NeuralNetwork:
         first_hidden_layer = hidden_layers[-1]
 
         # error of each output nodes
-
-        output = output.reshape((len(output), 1))
         delta = -1 * (target - output)
 
         delta = np.multiply(delta, output_layer.get_activation_function_derivative()(
             output_layer.get_net()
         ))
 
-        #adjusting delta of weights between last hidden layer and the output layer
+        # adjusting delta of weights between last hidden layer and the output layer
         delta_oh = delta * first_hidden_layer.get_last_output().T
         previous_weights = output_layer.get_weights()
-        output_layer.set_weights(output_layer.get_weights() + (delta_oh * -self.__hyperparameters.get_learning_rate()))
+        output_layer.set_weights(
+            output_layer.get_weights() +  # w (old weights)
+            (-self.__hyperparameters.get_learning_rate() * delta_oh)  # -η * Δw
+        )
 
         for hidden_layer_index in range(len(hidden_layers) - 1, 0, -1):
-            # TODO: forse meglio fare output_layer.get_weights().T * delta così da non trasporre due volte delta
             delta = delta.T * previous_weights
             delta = np.delete(delta, [0])
-            delta = np.multiply(delta.T,hidden_layers[hidden_layer_index].get_activation_function_derivative()(
+            delta = np.multiply(delta.T, hidden_layers[hidden_layer_index].get_activation_function_derivative()(
                 hidden_layers[hidden_layer_index].get_net()
             ))
-            deltah_h = delta * hidden_layers[hidden_layer_index - 1].get_last_output().T
+
+            # adjusting delta of weights between two hidden layers
+            delta_hh = delta * hidden_layers[hidden_layer_index - 1].get_last_output().T
             previous_weights = hidden_layers[hidden_layer_index].get_weights()
             hidden_layers[hidden_layer_index].set_weights(
-                hidden_layers[hidden_layer_index].get_weights() +
-                deltah_h * - self.__hyperparameters.get_learning_rate()
+                hidden_layers[hidden_layer_index].get_weights() +  # w (old weights)
+                (- self.__hyperparameters.get_learning_rate() * delta_hh)  # -η * Δw
             )
 
-        #TODO: forse meglio fare output_layer.get_weights().T * delta così da non trasporre due volte delta
         delta = delta.T * previous_weights
         delta = np.delete(delta, [0])
         delta = np.multiply(delta.T, hidden_layers[0].get_activation_function_derivative()(
@@ -93,7 +94,10 @@ class NeuralNetwork:
 
         # adjusting delta of weights between last hidden layer and the output layer
         delta_hi = delta * input_data.T
-        hidden_layers[0].set_weights(hidden_layers[0].get_weights() + (delta_hi * -self.__hyperparameters.get_learning_rate()))
+        hidden_layers[0].set_weights(
+            hidden_layers[0].get_weights() +  # w (old weights)
+            (-self.__hyperparameters.get_learning_rate() * delta_hi)  # -η * Δw
+        )
 
     def feed_forward(self, nn_input):
         """

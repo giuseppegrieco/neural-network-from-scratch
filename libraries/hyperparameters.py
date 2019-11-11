@@ -1,4 +1,8 @@
+"""
+    This module provide the concept of Neural Network Hyperparameters.
+"""
 from layer import _Layer
+
 
 class Hyperparameters:
     def __init__(self,
