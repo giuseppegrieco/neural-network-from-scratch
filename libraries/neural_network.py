@@ -14,6 +14,7 @@ class NeuralNetwork:
     def __init__(self, hyperparameters):
         self.__hyperparameters = hyperparameters
         self.__init_weights()
+        self.__errors = []
 
     def __init_weights(self):
         """
@@ -31,7 +32,13 @@ class NeuralNetwork:
         #input_data = np.append(np.array([1]), input_data)
         output = self.feed_forward(input_data)
         input_data = [1] + input_data
+        self.__errors.append(
+            ((expected_output-output)*(expected_output-output).T).item(0,0)
+        )
         self.__back_propagation(input_data, expected_output, output)
+
+    def get_errors(self):
+        return self.__errors
 
     def __back_propagation(self, input_data, target, output):
         """
@@ -60,9 +67,9 @@ class NeuralNetwork:
 
         #adjusting delta of weights between last hidden layer and the output layer
         delta_oh = delta * first_hidden_layer.get_last_output().T
+        previous_weights = output_layer.get_weights()
         output_layer.set_weights(output_layer.get_weights() + (delta_oh * -self.__hyperparameters.get_learning_rate()))
 
-        previous_weights = output_layer.get_weights()
         for hidden_layer_index in range(len(hidden_layers) - 1, 0, -1):
             # TODO: forse meglio fare output_layer.get_weights().T * delta così da non trasporre due volte delta
             delta = delta.T * previous_weights
@@ -71,11 +78,11 @@ class NeuralNetwork:
                 hidden_layers[hidden_layer_index].get_net()
             ))
             deltah_h = delta * hidden_layers[hidden_layer_index - 1].get_last_output().T
+            previous_weights = hidden_layers[hidden_layer_index].get_weights()
             hidden_layers[hidden_layer_index].set_weights(
                 hidden_layers[hidden_layer_index].get_weights() +
                 deltah_h * - self.__hyperparameters.get_learning_rate()
             )
-            previous_weights = hidden_layers[hidden_layer_index].get_weights()
 
         #TODO: forse meglio fare output_layer.get_weights().T * delta così da non trasporre due volte delta
         delta = delta.T * previous_weights
