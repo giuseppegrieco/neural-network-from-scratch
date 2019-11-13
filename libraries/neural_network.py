@@ -14,7 +14,6 @@ class NeuralNetwork:
     def __init__(self, hyperparameters):
         self.__hyperparameters = hyperparameters
         self.__init_weights()
-        self.__errors = []
 
     def __init_weights(self):
         """
@@ -29,16 +28,10 @@ class NeuralNetwork:
 
         TODO: write the method
         """
-        #input_data = np.append(np.array([1]), input_data)
         output = self.feed_forward(input_data)
         input_data = [1] + input_data
-        self.__errors.append(
-            ((expected_output-output)*(expected_output-output).T).item(0,0)
-        )
         self.__back_propagation(input_data, expected_output, output)
-
-    def get_errors(self):
-        return self.__errors
+        return np.power(expected_output[0] - output.item(0), 2)
 
     def __back_propagation(self, input_data, target, output):
         """
@@ -57,7 +50,7 @@ class NeuralNetwork:
         first_hidden_layer = hidden_layers[-1]
 
         # error of each output nodes
-        delta = -1 * (target - output)
+        delta = (target - output)
 
         delta = np.multiply(delta, output_layer.get_activation_function_derivative()(
             output_layer.get_net()
@@ -68,7 +61,8 @@ class NeuralNetwork:
         previous_weights = output_layer.get_weights()
         output_layer.set_weights(
             output_layer.get_weights() +  # w (old weights)
-            (-self.__hyperparameters.get_learning_rate() * delta_oh)  # -η * Δw
+            (self.__hyperparameters.get_learning_rate() * delta_oh) +  # -η * Δw
+            (-1 * self.__hyperparameters.get_lambda_reg() * output_layer.get_weights())
         )
 
         for hidden_layer_index in range(len(hidden_layers) - 1, 0, -1):
@@ -83,7 +77,8 @@ class NeuralNetwork:
             previous_weights = hidden_layers[hidden_layer_index].get_weights()
             hidden_layers[hidden_layer_index].set_weights(
                 hidden_layers[hidden_layer_index].get_weights() +  # w (old weights)
-                (- self.__hyperparameters.get_learning_rate() * delta_hh)  # -η * Δw
+                (self.__hyperparameters.get_learning_rate() * delta_hh) +  # -η * Δw
+                (-1 * self.__hyperparameters.get_lambda_reg() * hidden_layers[hidden_layer_index].get_weights())
             )
 
         delta = delta.T * previous_weights
@@ -96,7 +91,8 @@ class NeuralNetwork:
         delta_hi = delta * input_data.T
         hidden_layers[0].set_weights(
             hidden_layers[0].get_weights() +  # w (old weights)
-            (-self.__hyperparameters.get_learning_rate() * delta_hi)  # -η * Δw
+            (self.__hyperparameters.get_learning_rate() * delta_hi) +  # -η * Δw
+            (-1 * self.__hyperparameters.get_lambda_reg() * hidden_layers[0].get_weights())
         )
 
     def feed_forward(self, nn_input):

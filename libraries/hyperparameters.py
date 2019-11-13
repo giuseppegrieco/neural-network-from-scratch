@@ -9,7 +9,8 @@ class Hyperparameters:
                  input_nodes,
                  hidden_layers,
                  output_layer,
-                 learning_rate):
+                 learning_rate,
+                 lambda_reg):
         self.__input_nodes = input_nodes
         self.__hidden_layers = []
         self.set_hidden_layers(hidden_layers)
@@ -21,6 +22,10 @@ class Hyperparameters:
             output_layer[3]
         )
         self.__learning_rate = learning_rate
+        self.__lambda_reg = lambda_reg
+
+    def get_lambda_reg(self):
+        return self.__lambda_reg
 
     def get_input_nodes(self):
         return self.__input_nodes
