@@ -36,15 +36,17 @@ class GradientDescent(LearningAlgorithm):
         self.__alpha_momentum = alpha_momentum
 
     def train(self, neural_network, input_data, expected_output):
-        input_data = [1] + input_data
         output = neural_network.feed_forward(input_data)
+
+        input_data = [1] + input_data
+
         self.__back_propagation(
             neural_network,
             input_data,
             expected_output,
             output
         )
-        return np.power(expected_output[0] - output.item(0), 2)
+        return np.power(expected_output - output.item(0), 2)
 
     def __back_propagation(self, neural_network, input_data, target, output):
         """
@@ -68,16 +70,15 @@ class GradientDescent(LearningAlgorithm):
         delta = np.multiply(delta, output_layer.get_activation_function().f_derivative(
             output_layer.get_net()
         ))
+
+        # adjusting delta of weights between last hidden layer and the output layer
         delta_oh = delta * first_hidden_layer.get_last_output().T
         previous_weights = output_layer.get_weights()
-        output_layer.set_weights(
-            output_layer.get_weights() +  # w (old weights)
-            (self.__learning_rate * delta_oh) +  # -η * Δw
-            (-1 * self.__lambda_regularization * output_layer.get_weights())
-        )
+        self.__adjusting_weights(output_layer, delta_oh)
 
         for hidden_layer_index in range(len(hidden_layers) - 1, 0, -1):
             delta = delta.T * previous_weights
+            delta = np.delete(delta, [0])
             delta = np.multiply(delta.T, hidden_layers[hidden_layer_index].get_activation_function().f_derivative(
                 hidden_layers[hidden_layer_index].get_net()
             ))
@@ -85,21 +86,21 @@ class GradientDescent(LearningAlgorithm):
             # adjusting delta of weights between two hidden layers
             delta_hh = delta * hidden_layers[hidden_layer_index - 1].get_last_output().T
             previous_weights = hidden_layers[hidden_layer_index].get_weights()
-            hidden_layers[hidden_layer_index].set_weights(
-                hidden_layers[hidden_layer_index].get_weights() +  # w (old weights)
-                (self.__learning_rate * delta_hh) +  # -η * Δw
-                (-1 * self.__lambda_regularization * hidden_layers[hidden_layer_index].get_weights())
-            )
+            self.__adjusting_weights(hidden_layers[hidden_layer_index], delta_hh)
 
         delta = delta.T * previous_weights
+        delta = np.delete(delta, [0])
         delta = np.multiply(delta.T, hidden_layers[0].get_activation_function().f_derivative(
             hidden_layers[0].get_net()
         ))
 
         # adjusting delta of weights between last hidden layer and the output layer
         delta_hi = delta * input_data.T
-        hidden_layers[0].set_weights(
-            hidden_layers[0].get_weights() +  # w (old weights)
-            (self.__learning_rate * delta_hi) +  # -η * Δw
-            (-1 * self.__lambda_regularization * hidden_layers[0].get_weights())
+        self.__adjusting_weights(hidden_layers[0], delta_hi)
+
+    def __adjusting_weights(self, layer, delta):
+        layer.set_weights(
+            layer.get_weights() +   # w (old weights)
+            (self.__learning_rate * delta) +  # -η * Δw
+            (-1 * self.__lambda_regularization * layer.get_weights())
         )

@@ -1,21 +1,8 @@
-import neural_network as nn
+import libraries as ml
 import matplotlib.pyplot as plt
 import csv
 import numpy as np
-import sys
-
-nn = nn.NeuralNetwork(
-    input_size=6,
-    topology=[
-        nn.Layer(nodes=3, activation_function=nn.Sigmoid()),
-        nn.Layer(nodes=1, activation_function=nn.Sigmoid())
-    ],
-    learning_algorithm=nn.GradientDescent(
-        learning_rate=0.3,
-        lambda_regularization=0.0001,
-        alpha_momentum=0.0
-    )
-)
+import random
 
 
 def file_parser(file_name, input_list, output_list):
@@ -38,6 +25,18 @@ def file_parser(file_name, input_list, output_list):
         return output_list
 
 
+hyper_parameters = ml.Hyperparameters(
+    6,  # input layer
+    [
+        [3, True, ml.sigmoid, ml.sigmoid_derivative],
+    ],  # hidden layers
+    [1, False, ml.sigmoid, ml.sigmoid_derivative],  # output layer
+    0.2,
+    0.0001
+)
+
+nn = ml.NeuralNetwork(hyper_parameters)
+
 tr_input = []
 tr_output = []
 ts_input = []
@@ -57,7 +56,7 @@ for i in range(1, 500):
     # vect = list(range(len(tr)))
     # random.shuffle(vect)
     for j in range(0, len(tr_input)):
-        current_terror = current_terror + nn.train(tr_input[j], tr_output[j])
+        current_terror = current_terror + nn.train(tr_input,)
     current_terror = (1 / len(tr_input)) * current_terror
     terrors.append(current_terror)
     for j in range(0, len(ts_input)):
@@ -86,5 +85,3 @@ plt.plot(terrors, '-b', label='Training')
 plt.plot(verrors, '--r', label='Validation')
 plt.legend()
 plt.show()
-
-sys.exit()

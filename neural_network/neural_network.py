@@ -31,17 +31,23 @@ class NeuralNetwork:
 
         for layer in self.__topology:
             layer.set_weights(
-                np.random.rand(layer.get_nodes(), previous_nodes + 1)
+                np.random.rand(layer.get_nodes(), 1 + previous_nodes)
             )
             previous_nodes = layer.get_nodes()
+            layer.set_is_hidden(1)
+
+        self.__topology[-1].set_is_hidden(0)
 
     def train(self, input_data, expected_output):
         return self.__learning_algorithm.train(self, input_data, expected_output)
 
     def feed_forward(self, input_data):
+        input_data = [1] + input_data
         input_data = np.array(input_data, dtype=float)
+
         for layer in self.__topology:
             input_data = layer.computes(input_data)
+
         return input_data
 
     def get_topology(self):

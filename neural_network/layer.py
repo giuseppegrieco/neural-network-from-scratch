@@ -1,6 +1,7 @@
 """
     This module provide the concept of Neural Network's Layer.
 """
+import numpy as np
 
 
 class Layer:
@@ -21,6 +22,8 @@ class Layer:
         self.__weights = None
         self.__net = None
         self.__last_output = None
+        self.__is_hidden = None
+        self.__delta_weights = None
 
     def computes(self, input_data):
         input_data = input_data.reshape((len(input_data), 1))
@@ -32,14 +35,22 @@ class Layer:
 
         # calculates the output of the layer
         self.__last_output = self.__activation_function.f(self.__net)
-
+        if self.__is_hidden:
+            self.__last_output = np.append(np.array([1]), self.__last_output)
+        self.__last_output = self.__last_output.reshape(len(self.__last_output), 1)
         return self.__last_output
-
-    def set_bias(self, bias):
-        self.__bias = bias
 
     def set_weights(self, weights):
         self.__weights = weights
+
+    def set_delta_weights(self, delta_weights):
+        self.__delta_weights = delta_weights
+
+    def set_is_hidden(self, is_hidden):
+        self.__is_hidden = is_hidden
+
+    def get_delta_weights(self):
+        return self.__delta_weights
 
     def get_weights(self):
         return self.__weights
