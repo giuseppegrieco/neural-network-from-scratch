@@ -3,6 +3,17 @@ import matplotlib.pyplot as plt
 import csv
 import numpy as np
 import sys
+import random
+import string
+
+# Hyperparameters
+eta = 0.3
+lambda_reg = 0.0001
+alpha_momentum = 0.1
+topology = [
+    nn.Layer(nodes=3, activation_function=nn.Sigmoid()),
+    nn.Layer(nodes=1, activation_function=nn.Sigmoid())
+]
 
 nn = nn.NeuralNetwork(
     input_size=6,
@@ -11,9 +22,9 @@ nn = nn.NeuralNetwork(
         nn.Layer(nodes=1, activation_function=nn.Sigmoid())
     ],
     learning_algorithm=nn.GradientDescent(
-        learning_rate=0.3,
-        lambda_regularization=0.0001,
-        alpha_momentum=0.3
+        learning_rate=eta,
+        lambda_regularization=lambda_reg,
+        alpha_momentum=alpha_momentum
     )
 )
 
@@ -45,7 +56,6 @@ ts_output = []
 
 file_parser('monks-1.train', tr_input, tr_output)
 file_parser('monks-1.test', ts_input, ts_output)
-
 
 # wrong way !!!!
 terrors = []
@@ -82,9 +92,23 @@ print(nn.feed_forward(tr_input[1]))  # 0
 print(nn.feed_forward(tr_input[13]))  # 1
 print(nn.feed_forward(tr_input[18]))  # 1
 
-plt.plot(terrors, '-b', label='Training')
-plt.plot(verrors, '--r', label='Validation')
-plt.legend()
+fig, subplot = plt.subplots(nrows=1, ncols=1)
+subplot.plot(terrors, '-b', label='Training')
+subplot.plot(verrors, '--r', label='Validation')
+subplot.legend()
+
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+text_str = '\n'.join((
+    r'hidden layers=(2, 3, 5)',
+    r'eta=%.2f' % (eta,),
+    r'lambda=%.2f' % (lambda_reg,),
+    r'alpha=%.2f' % (alpha_momentum,)))
+subplot.text(0.695, 0.8, text_str, transform=subplot.transAxes, fontsize=10,
+             verticalalignment='top', bbox=props)
+
+all_char = string.ascii_letters + string.punctuation + string.digits
+graph_name = "".join(random.choice(all_char) for x in range(random.randint(8, 12)))
 plt.show()
+fig.savefig(graph_name)
 
 sys.exit()
