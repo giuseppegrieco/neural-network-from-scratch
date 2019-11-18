@@ -99,8 +99,12 @@ class GradientDescent(LearningAlgorithm):
         self.__adjusting_weights(hidden_layers[0], delta_hi)
 
     def __adjusting_weights(self, layer, delta):
+        # (-η * Δw) + (-λ * w) + (-α * Δw_old)
+        delta_layer = (self.__learning_rate * delta) +\
+                      (-self.__lambda_regularization * layer.get_weights()) +\
+                      (self.__alpha_momentum * layer.get_delta_old())
         layer.set_weights(
             layer.get_weights() +   # w (old weights)
-            (self.__learning_rate * delta) +  # -η * Δw
-            (-1 * self.__lambda_regularization * layer.get_weights())
+            delta_layer
         )
+        layer.set_delta_old(delta_layer)

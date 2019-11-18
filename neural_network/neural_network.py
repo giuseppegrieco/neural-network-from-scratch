@@ -33,6 +33,9 @@ class NeuralNetwork:
             layer.set_weights(
                 np.random.rand(layer.get_nodes(), 1 + previous_nodes)
             )
+            layer.set_delta_old(
+                np.zeros((layer.get_nodes(), 1 + previous_nodes))
+            )
             previous_nodes = layer.get_nodes()
             layer.set_is_hidden(1)
 

@@ -23,7 +23,7 @@ class Layer:
         self.__net = None
         self.__last_output = None
         self.__is_hidden = None
-        self.__delta_weights = None
+        self.__delta_old = None
 
     def computes(self, input_data):
         input_data = input_data.reshape((len(input_data), 1))
@@ -43,14 +43,14 @@ class Layer:
     def set_weights(self, weights):
         self.__weights = weights
 
-    def set_delta_weights(self, delta_weights):
-        self.__delta_weights = delta_weights
+    def set_delta_old(self, delta_old):
+        self.__delta_old = delta_old
 
     def set_is_hidden(self, is_hidden):
         self.__is_hidden = is_hidden
 
-    def get_delta_weights(self):
-        return self.__delta_weights
+    def get_delta_old(self):
+        return self.__delta_old
 
     def get_weights(self):
         return self.__weights

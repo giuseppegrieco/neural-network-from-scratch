@@ -13,7 +13,7 @@ nn = nn.NeuralNetwork(
     learning_algorithm=nn.GradientDescent(
         learning_rate=0.3,
         lambda_regularization=0.0001,
-        alpha_momentum=0.0
+        alpha_momentum=0.3
     )
 )
 
