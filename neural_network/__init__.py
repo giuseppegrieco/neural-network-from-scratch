@@ -6,17 +6,18 @@ Artificial Neural Network.
 Style Guide:
 http://google.github.io/styleguide/pyguide.html
 """
-from .hyperparameters import Hyperparameters
 from .neural_network import NeuralNetwork
-from .activation_functions import sigmoid
-from .activation_functions import sigmoid_derivative
-from .activation_functions import relu
+from .layer import Layer
+from .activation_function import *
+from .learning_algorithm import *
 
 # Import able to access:
 __all__ = [
-    'Hyperparameters',
+    'Layer',
+    'LearningAlgorithm',
+    'GradientDescent',
     'NeuralNetwork',
-    'sigmoid',
-    'relu',
-    'sigmoid_derivative'
+    'ActivationFunction',
+    'Tanh',
+    'Sigmoid',
 ]
