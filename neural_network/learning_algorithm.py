@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import convert_in_numpy
+from .utils import convert_in_numpy
 
 
 class LearningAlgorithm:
