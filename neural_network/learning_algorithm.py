@@ -88,6 +88,7 @@ class GradientDescent(LearningAlgorithm):
             previous_weights = hidden_layers[hidden_layer_index].get_weights()
             self.__adjusting_weights(hidden_layers[hidden_layer_index], delta_hh)
 
+        #TODO check here
         delta = np.multiply(delta.T, previous_weights)
         delta = delta[:, 1:]
         delta = np.multiply(delta.T, hidden_layers[0].get_activation_function().f_derivative(
