@@ -10,6 +10,7 @@ from .neural_network import NeuralNetwork
 from .layer import Layer
 from .activation_function import *
 from .learning_algorithm import *
+from .utils import *
 
 # Import able to access:
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     'ActivationFunction',
     'Tanh',
     'Sigmoid',
+    'convert_in_numpy'
 ]

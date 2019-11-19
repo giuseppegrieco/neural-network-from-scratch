@@ -1,5 +1,7 @@
 import numpy as np
 
+from utils import convert_in_numpy
+
 
 class LearningAlgorithm:
     def train(self, neural_network, input_data, expected_output):
@@ -37,8 +39,7 @@ class GradientDescent(LearningAlgorithm):
 
     def train(self, neural_network, input_data, expected_output):
         output = neural_network.feed_forward(input_data)
-
-        input_data = [1] + input_data
+        input_data = convert_in_numpy(input_data)
 
         self.__back_propagation(
             neural_network,
@@ -46,7 +47,9 @@ class GradientDescent(LearningAlgorithm):
             expected_output,
             output
         )
-        return np.power(expected_output - output.item(0), 2)
+        error = 0
+        expected_output = np.mat(expected_output)
+        return np.matrix.sum(np.power(expected_output - output.T, 2)) * 1 / len(expected_output)
 
     def __back_propagation(self, neural_network, input_data, target, output):
         """
@@ -54,9 +57,6 @@ class GradientDescent(LearningAlgorithm):
 
         TODO: fix the method (note output is already vector column)
         """
-        # reshape input vector as column vector
-        input_data = np.array(input_data, dtype=float).reshape((len(input_data), 1))
-
         # reshape target vector as column vector
         target = np.mat(np.array(target)).T
 
@@ -88,8 +88,8 @@ class GradientDescent(LearningAlgorithm):
             previous_weights = hidden_layers[hidden_layer_index].get_weights()
             self.__adjusting_weights(hidden_layers[hidden_layer_index], delta_hh)
 
-        delta = delta.T * previous_weights
-        delta = np.delete(delta, [0])
+        delta = np.multiply(delta.T, previous_weights)
+        delta = delta[:, 1:]
         delta = np.multiply(delta.T, hidden_layers[0].get_activation_function().f_derivative(
             hidden_layers[0].get_net()
         ))

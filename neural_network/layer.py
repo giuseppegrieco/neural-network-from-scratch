@@ -3,6 +3,8 @@
 """
 import numpy as np
 
+from utils import convert_in_numpy
+
 
 class Layer:
     def __init__(self, nodes, activation_function):
@@ -26,8 +28,6 @@ class Layer:
         self.__delta_old = None
 
     def computes(self, input_data):
-        input_data = input_data.reshape((len(input_data), 1))
-
         # performs the net of the layer
         self.__net = self.__weights.dot(
             input_data
@@ -36,8 +36,7 @@ class Layer:
         # calculates the output of the layer
         self.__last_output = self.__activation_function.f(self.__net)
         if self.__is_hidden:
-            self.__last_output = np.append(np.array([1]), self.__last_output)
-        self.__last_output = self.__last_output.reshape(len(self.__last_output), 1)
+            self.__last_output = convert_in_numpy(self.__last_output)
         return self.__last_output
 
     def set_weights(self, weights):

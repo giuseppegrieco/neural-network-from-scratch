@@ -3,6 +3,7 @@
 """
 import numpy as np
 
+from utils import convert_in_numpy
 
 class NeuralNetwork:
     def __init__(self,
@@ -45,8 +46,7 @@ class NeuralNetwork:
         return self.__learning_algorithm.train(self, input_data, expected_output)
 
     def feed_forward(self, input_data):
-        input_data = [1] + input_data
-        input_data = np.array(input_data, dtype=float)
+        input_data = convert_in_numpy(input_data)
 
         for layer in self.__topology:
             input_data = layer.computes(input_data)
