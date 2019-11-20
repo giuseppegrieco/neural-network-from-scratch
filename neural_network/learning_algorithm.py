@@ -104,10 +104,14 @@ class GradientDescent(LearningAlgorithm):
     def __adjusting_weights(self, layer, delta):
         # (-η * Δw) + (-λ * w) + (-α * Δw_old)
         delta_layer = (self.__learning_rate * delta) +\
-                      (-self.__lambda_regularization * layer.get_weights()) +\
                       (self.__alpha_momentum * layer.get_delta_old())
+        layer_weights = layer.get_weights()
+        lambda_mat = np.full(layer_weights.shape, -self.__lambda_regularization)
+        if layer.get_is_hidden():
+            lambda_mat[:, 0] = 0.0
+        delta_layer = delta_layer + np.multiply(lambda_mat, layer_weights)
         layer.set_weights(
-            layer.get_weights() +   # w (old weights)
+            layer_weights +   # w (old weights)
             delta_layer
         )
         layer.set_delta_old(delta_layer)

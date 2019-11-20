@@ -48,6 +48,9 @@ class Layer:
     def set_is_hidden(self, is_hidden):
         self.__is_hidden = is_hidden
 
+    def get_is_hidden(self):
+        return self.__is_hidden
+
     def get_delta_old(self):
         return self.__delta_old
 
