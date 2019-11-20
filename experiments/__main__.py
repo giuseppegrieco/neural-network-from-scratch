@@ -7,11 +7,14 @@ import random
 import string
 
 # Hyperparameters
-eta = 0.3
-lambda_reg = 0.0001
+eta = 0.01
+lambda_reg = 0.001
 alpha_momentum = 0.1
 topology = [
-    nn.Layer(nodes=3, activation_function=nn.Sigmoid()),
+    nn.Layer(nodes=4, activation_function=nn.Sigmoid()),
+    nn.Layer(nodes=4, activation_function=nn.Sigmoid()),
+    nn.Layer(nodes=4, activation_function=nn.Sigmoid()),
+
     nn.Layer(nodes=1, activation_function=nn.Sigmoid())
 ]
 
@@ -24,6 +27,7 @@ nn = nn.NeuralNetwork(
         alpha_momentum=alpha_momentum
     )
 )
+
 
 def file_parser(file_name, input_list, output_list):
     index = 0
@@ -58,7 +62,10 @@ terrors = []
 verrors = []
 
 tr_input = np.mat(tr_input).T.tolist()
-for i in range(1, 500):
+ts_input = np.mat(ts_input).T.tolist()
+#tr_input = [[0, 0, 1, 1],[0, 1, 0, 1]]
+#tr_output = [0, 1, 1, 0]
+for i in range(1, 10000):
     current_verror = 0
     current_terror = 0
     # vect = list(range(len(tr)))
@@ -66,22 +73,25 @@ for i in range(1, 500):
 
     terrors.append(nn.train(tr_input, tr_output))
 
-    for j in range(0, len(ts_input)):
-        current_verror = current_verror + np.power(ts_output[j] - nn.feed_forward(ts_input[j]).item(0), 2)
-    current_verror = 1 / len(ts_input) * current_verror
-    verrors.append(current_verror)
+    vt = nn.feed_forward(ts_input)
+    expected_output = np.mat(ts_output)
 
-print(nn.feed_forward(tr_input[0]))  # 0
-print(nn.feed_forward(tr_input[1]))  # 0
-print(nn.feed_forward(tr_input[13]))  # 1
-print(nn.feed_forward(tr_input[18]))  # 1
+    verrors.append(
+       np.matrix.sum(np.power(expected_output - vt, 2)) * 1 / len(expected_output.T)
+    )
 
+    #for j in range(0, len(ts_input)):
+        #current_verror = current_verror + np.power(ts_output[j] - nn.feed_forward(ts_input[j]).item(0), 2)
+    #current_verror = 1 / len(ts_input) * current_verror
+    #verrors.append(current_verror)
 
+tr_input = np.mat(tr_input)
+print(nn.feed_forward(tr_input[:,4].tolist()))
+print(nn.feed_forward(tr_input[:,10].tolist()))
 fig, subplot = plt.subplots(nrows=1, ncols=1)
 subplot.plot(terrors, '-b', label='Training')
 subplot.plot(verrors, '--r', label='Validation')
 subplot.legend()
-
 
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 text_str = '\n'.join((
