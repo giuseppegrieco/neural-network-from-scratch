@@ -43,6 +43,24 @@ class NeuralNetwork:
 
         self.__topology[-1].set_is_hidden(0)
 
+    def train_epochs_with_compare(self, input_data, expected_output, epochs, compare_data, compare_output):
+        t_errors = []
+        c_errors = []
+        for i in range(0, epochs):
+            t_errors.append(self.train(input_data, expected_output))
+            c_errors.append(
+                np.matrix.sum(np.power(compare_output - self.feed_forward(compare_data), 2)) * 1 / len(
+                    np.mat(compare_output).T
+                )
+            )
+        return t_errors, c_errors
+
+    def train_epochs(self, input_data, expected_output, epochs):
+        t_errors = []
+        for i in range(0, epochs):
+            t_errors.append(self.train(input_data, expected_output))
+        return t_errors
+
     def train(self, input_data, expected_output):
         return self.__learning_algorithm.train(self, input_data, expected_output)
 
