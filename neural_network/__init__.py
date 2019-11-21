@@ -21,5 +21,6 @@ __all__ = [
     'ActivationFunction',
     'Tanh',
     'Sigmoid',
-    'convert_in_numpy'
+    'convert_in_numpy',
+    'save_graph'
 ]

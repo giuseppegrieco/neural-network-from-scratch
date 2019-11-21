@@ -41,15 +41,18 @@ class GradientDescent(LearningAlgorithm):
         output = neural_network.feed_forward(input_data)
         input_data = convert_in_numpy(input_data)
 
+        # reshape target vector as column vector
+
+        expected_output = np.mat(np.array(expected_output))
+
         self.__back_propagation(
             neural_network,
             input_data,
             expected_output,
             output
         )
-        expected_output = np.mat(expected_output)
 
-        return np.matrix.sum(np.power(expected_output - output, 2)) * 1 / len(expected_output.T)
+        return np.matrix.sum(np.power(expected_output - output, 2)) * (1 / len(expected_output.T))
 
     def __back_propagation(self, neural_network, input_data, target, output):
         """
@@ -57,8 +60,6 @@ class GradientDescent(LearningAlgorithm):
 
         TODO: fix the method (note output is already vector column)
         """
-        # reshape target vector as column vector
-        target = np.mat(np.array(target))
 
         output_layer = neural_network.get_topology()[-1]
         hidden_layers = neural_network.get_topology()[:-1]
@@ -73,11 +74,12 @@ class GradientDescent(LearningAlgorithm):
 
         # adjusting delta of weights between last hidden layer and the output layer
         delta_oh = delta * first_hidden_layer.get_last_output().T
+
         previous_weights = output_layer.get_weights()
+
         self.__adjusting_weights(output_layer, delta_oh)
 
         for hidden_layer_index in range(len(hidden_layers) - 1, 0, -1):
-            #delta = np.multiply(delta.T, previous_weights)
             delta = delta.T * previous_weights
             delta = delta[:, 1:]
             delta = np.multiply(delta.T, hidden_layers[hidden_layer_index].get_activation_function().f_derivative(
@@ -89,8 +91,6 @@ class GradientDescent(LearningAlgorithm):
             previous_weights = hidden_layers[hidden_layer_index].get_weights()
             self.__adjusting_weights(hidden_layers[hidden_layer_index], delta_hh)
 
-        #TODO check here
-        #delta = np.multiply(delta.T, previous_weights)
         delta = delta.T * previous_weights
         delta = delta[:, 1:]
         delta = np.multiply(delta.T, hidden_layers[0].get_activation_function().f_derivative(

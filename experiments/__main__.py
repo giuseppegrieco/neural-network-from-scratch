@@ -8,16 +8,16 @@ import string
 import os
 
 # Hyperparameters
-eta = 0.01
-lambda_reg = 0.0001
-alpha_momentum = 0.1
+eta = 0.08
+lambda_reg = 0.00
+alpha_momentum = 0.6
 topology = [
-    nn.Layer(nodes=5, activation_function=nn.Sigmoid()),
+    nn.Layer(nodes=2, activation_function=nn.Sigmoid()),
     nn.Layer(nodes=1, activation_function=nn.Sigmoid())
 ]
 
-nn = nn.NeuralNetwork(
-    input_size=6,
+my_nn = nn.NeuralNetwork(
+    input_size=17,
     topology=topology,
     learning_algorithm=nn.GradientDescent(
         learning_rate=eta,
@@ -46,14 +46,14 @@ def file_parser(file_name, input_list, output_list):
         csv_reader = csv.reader(csv_file, delimiter=' ')
 
         for row in csv_reader:
-            input_list.append([
-                float(row[2]),
-                float(row[3]),
-                float(row[4]),
-                float(row[5]),
-                float(row[6]),
-                float(row[7])
-            ])
+            value = [0] * 17
+            value[int(row[2]) - 1] = 1
+            value[3 + int(row[3]) - 1] = 1
+            value[6 + int(row[4]) - 1] = 1
+            value[8 + int(row[5]) - 1] = 1
+            value[11 + int(row[6]) - 1] = 1
+            value[15 + int(row[7]) - 1] = 1
+            input_list.append(value)
             output_list.append(float(row[1]))
             index = index + 1
         csv_file.close()
@@ -79,15 +79,15 @@ tr_input = np.mat(tr_input).T.tolist()
 ts_input = np.mat(ts_input).T.tolist()
 # tr_input = [[0, 0, 1, 1],[0, 1, 0, 1]]
 # tr_output = [0, 1, 1, 0]
-for i in range(1, 10000):
+for i in range(1, 1000):
     current_verror = 0
     current_terror = 0
     # vect = list(range(len(tr)))
     # random.shuffle(vect)
 
-    tr_errors.append(nn.train(tr_input, tr_output))
+    tr_errors.append(my_nn.train(tr_input, tr_output))
 
-    vt = nn.feed_forward(ts_input)
+    vt = my_nn.feed_forward(ts_input)
     expected_output = np.mat(ts_output)
 
     v_errors.append(
@@ -97,6 +97,9 @@ for i in range(1, 10000):
     # v_accuracy.append(computes_accuracy(vt,expected_output))
 
 print(computes_accuracy(vt, expected_output))
+
+tr_errors.pop(0)
+v_errors.pop(0)
 
 fig, subplot = plt.subplots(nrows=1, ncols=1)
 subplot.plot(tr_errors, '-b', label='Training')
