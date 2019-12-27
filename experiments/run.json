@@ -1,0 +1,9 @@
+{
+  "input": 5,
+  "range": {
+    "layer": {
+      "nodi",
+      "funzione": "sigmoide"
+    }
+  }
+}

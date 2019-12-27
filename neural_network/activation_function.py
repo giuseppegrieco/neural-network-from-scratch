@@ -29,11 +29,19 @@ class ActivationFunction:
     def f_derivative(self, x):
         pass
 
+class Identity(ActivationFunction):
+
+    def f(self, x):
+        return x
+
+    def f_derivative(self, x):
+        return np.ones(x.shape)
 
 class Sigmoid(ActivationFunction):
 
     def f(self, x):
-        return 1 / (1 + np.exp(-x))
+        res = 1 / (1 + np.exp(-x))
+        return res
 
     def f_derivative(self, x):
         return np.multiply(self.f(x), (1 - self.f(x)))

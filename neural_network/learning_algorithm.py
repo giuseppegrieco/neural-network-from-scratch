@@ -51,7 +51,6 @@ class GradientDescent(LearningAlgorithm):
             expected_output,
             output
         )
-
         return np.matrix.sum(np.power(expected_output - output, 2)) * (1 / len(expected_output.T))
 
     def __back_propagation(self, neural_network, input_data, target, output):
