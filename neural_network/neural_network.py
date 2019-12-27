@@ -33,7 +33,7 @@ class NeuralNetwork:
 
         for layer in self.__topology:
             layer.set_weights(
-                np.random.rand(layer.get_nodes(), 1 + previous_nodes)
+                np.random.normal(0, 1 / np.sqrt(1 + previous_nodes), (layer.get_nodes(), 1 + previous_nodes))
             )
             layer.set_delta_old(
                 np.zeros((layer.get_nodes(), 1 + previous_nodes))
