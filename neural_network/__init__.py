@@ -22,5 +22,7 @@ __all__ = [
     'Tanh',
     'Sigmoid',
     'convert_in_numpy',
-    'save_graph'
+    'save_graph',
+    'utils',
+
 ]

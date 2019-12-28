@@ -74,3 +74,15 @@ class NeuralNetwork:
 
     def get_topology(self):
         return self.__topology
+
+    def get_all_weights(self):
+        weights = []
+        for layer in self.get_topology():
+            weights.append(layer.get_weights())
+        return weights
+
+    def get_number_of_nodes(self):
+        nodes = []
+        for layer in self.get_topology():
+            nodes.append(layer.get_nodes())
+        return nodes
