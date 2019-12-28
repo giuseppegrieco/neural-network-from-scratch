@@ -35,10 +35,8 @@ def run(training, validation, input_size, lambda_reg, alpha_momentum, topology, 
 
     initial_weights = my_nn.get_all_weights()
 
-    # wrong way !!!!
     tr_errors = []
     v_errors = []
-    v_accuracy = []
     vt = 0
     expected_output = 0
 
@@ -46,9 +44,7 @@ def run(training, validation, input_size, lambda_reg, alpha_momentum, topology, 
     ts_input = np.mat(validation[0]).T.tolist()
     tr_output = training[1]
     ts_output = validation[1]
-    # tr_output = training.second
-    # tr_input = [[0, 0, 1, 1],[0, 1, 0, 1]]
-    # tr_output = [0, 1, 1, 0]
+
     for i in range(1, epochs):
         tr_errors.append(my_nn.train(tr_input, tr_output))
 
@@ -58,9 +54,6 @@ def run(training, validation, input_size, lambda_reg, alpha_momentum, topology, 
         v_errors.append(
             np.matrix.sum(np.power(expected_output - vt, 2)) * 1 / len(expected_output.T)
         )
-
-        # Calcolo accuracy
-        # v_accuracy.append(computes_accuracy(vt,expected_output))
 
     print(utils.computes_accuracy(vt, expected_output))
 
@@ -76,33 +69,26 @@ def run(training, validation, input_size, lambda_reg, alpha_momentum, topology, 
     return
 
 
-tr_input = []
-tr_output = []
-ts_input = []
-ts_output = []
+input_file = sys.argv[1]
 
-utils.monk_parser('monks-2.train', tr_input, tr_output)
-utils.monk_parser('monks-2.test', ts_input, ts_output)
+with open('./experiments/' + input_file, 'r') as fp:
+    data = json.load(fp)
 
-# Hyperparameters range
-a_eta = [0.1]
-a_lambda_reg = [0.0]
-a_alpha_momentum = [0.5]
-a_topology = [[
-    nn.Layer(nodes=2, activation_function=nn.Sigmoid()),
-    nn.Layer(nodes=1, activation_function=nn.Sigmoid())
-]]
-input_size = 17
+input_size, training_file, validation_file, epochs, a_eta, a_lambda_reg, a_alpha_momentum, learning_algorithm, a_topology, thread_number = utils.read_input(
+    data)
+
+tr_input, tr_output = utils.monk_parser(training_file)
+ts_input, ts_output = utils.monk_parser(validation_file)
+
 training = (tr_input, tr_output)
 validation = (ts_input, ts_output)
-epochs = 500
-
-thread_executor = ProcessPoolExecutor(4)
+thread_executor = ProcessPoolExecutor(thread_number)
 
 start_time_GS = datetime.datetime.now().timestamp()
 futures = []
+
 # Generate all possible combinations
-for eta in a_eta:
+for eta in a_eta:  # TODO: forse è meglio mettere come primo for la topologia
     for lambda_reg in a_lambda_reg:
         for alpha_momentum in a_alpha_momentum:
             for topology in a_topology:
@@ -111,9 +97,10 @@ for eta in a_eta:
                         run, training, validation, input_size, lambda_reg, alpha_momentum, topology, epochs, eta
                     )
                 )
-end_time_GS = datetime.datetime.now().timestamp()
-grid_search_duration_in_sec = end_time_GS - start_time_GS
-
 concurrent.futures.wait(futures)
 thread_executor.shutdown()
+
+end_time_GS = datetime.datetime.now().timestamp()
+grid_search_duration_in_sec = end_time_GS - start_time_GS  # TODO: ha senso salvarla?
+
 sys.exit()

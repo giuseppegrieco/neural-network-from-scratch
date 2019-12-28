@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import csv
 import json
+import neural_network as nn
 
 
 def convert_in_numpy(target):
@@ -17,7 +18,7 @@ def convert_in_numpy(target):
         return np.vstack((bias, target))
 
 
-def save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, path, file_name,nodes_number):
+def save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, path, file_name, nodes_number):
     fig, subplot = plt.subplots(nrows=1, ncols=1)
     subplot.plot(tr_errors, '-b', label='Training')
     subplot.plot(v_errors, '--r', label='Validation')
@@ -43,7 +44,9 @@ def save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, path, file_
         print(e)
 
 
-def monk_parser(file_name, input_list, output_list):
+def monk_parser(file_name):
+    input_list = []
+    output_list = []
     index = 0
     with open(file_name) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=' ')
@@ -60,7 +63,7 @@ def monk_parser(file_name, input_list, output_list):
             output_list.append(float(row[1]))
             index = index + 1
         csv_file.close()
-        return output_list
+        return input_list, output_list
 
 
 def computes_accuracy(targets, expected_output):
@@ -105,7 +108,7 @@ def create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec,
 def save_data(directory_name, tr_errors, v_errors, final_weights, initial_weights, eta, lambda_reg, alpha_momentum,
               epochs, duration_in_sec, my_nn):
     save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, "/charts/",
-               directory_name,my_nn.get_number_of_nodes())
+               directory_name, my_nn.get_number_of_nodes())
     save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum,
                "/grid_search/" + directory_name + "/", directory_name, my_nn.get_number_of_nodes())
 
@@ -119,4 +122,32 @@ def save_data(directory_name, tr_errors, v_errors, final_weights, initial_weight
                        './grid_search/' + directory_name + '/')
 
 
+def read_input(data):
+    def get_topology_from_json(input_topologies):
+        all_topologies = []
+        for topology in input_topologies:
+            layers = []
+            for layer in topology:
+                nodes = layer['nodes']
+                if layer['activation_function'] == 'Sigmoid':
+                    activation_function = nn.Sigmoid()
+                else:
+                    activation_function = nn.Identity()  # TODO: add all functions
+                layers.append(nn.Layer(nodes=nodes, activation_function=activation_function))
+            all_topologies.append(layers)
 
+        return all_topologies
+
+    input_size = data['input_size']
+    training_file = data['training_file']
+    validation_file = data['validation_file']
+    epochs = data['epochs']
+    a_eta = data["learning_rate"]
+    a_lambda_reg = data["lambda_regularization"]
+    a_alpha_momentum = data["alpha_momentum"]
+    learning_algorithm = data["learning_algorithm"]  # TODO: check
+    topologies = data["topology"]
+    a_topology = get_topology_from_json(topologies)
+    thread_number = data['thread_number']
+
+    return input_size, training_file, validation_file, epochs, a_eta, a_lambda_reg, a_alpha_momentum, learning_algorithm, a_topology, thread_number

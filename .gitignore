@@ -108,3 +108,4 @@ venv.bak/
 
 #charts
 .charts/
+.grid_search/
