@@ -107,5 +107,5 @@ venv.bak/
 .idea/
 
 #charts
-.charts/
-.grid_search/
+charts/
+grid_search/

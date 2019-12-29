@@ -151,3 +151,14 @@ def read_input(data):
     thread_number = data['thread_number']
 
     return input_size, training_file, validation_file, epochs, a_eta, a_lambda_reg, a_alpha_momentum, learning_algorithm, a_topology, thread_number
+
+
+def early_stopping(error, min_error, counter, epoch):
+    res = False
+    if error < min_error:
+        min_error = error
+    elif epoch > 200:  # TODO: metti una variabile o qualocsa
+        if counter == 1:
+            res = True
+        counter = counter - 1
+    return error, min_error, counter, epoch, res

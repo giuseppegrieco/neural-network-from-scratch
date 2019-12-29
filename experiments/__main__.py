@@ -20,9 +20,9 @@ def run(training, validation, input_size, lambda_reg, alpha_momentum, topology, 
             print(e)
         return directory_name
 
+    start_time = datetime.datetime.now().timestamp()
     directory_name = create_timestamp_directory()
 
-    start_time = datetime.datetime.now().timestamp()
     my_nn = nn.NeuralNetwork(
         input_size=input_size,
         topology=topology,
@@ -45,15 +45,21 @@ def run(training, validation, input_size, lambda_reg, alpha_momentum, topology, 
     tr_output = training[1]
     ts_output = validation[1]
 
-    for i in range(1, epochs):
-        tr_errors.append(my_nn.train(tr_input, tr_output))
+    min_error = sys.float_info.max
+    counter = 20
+    for epoch in range(1, epochs + 1):
+        error = my_nn.train(tr_input, tr_output)
+        tr_errors.append(error)
 
         vt = my_nn.feed_forward(ts_input)
         expected_output = np.mat(ts_output)
 
-        v_errors.append(
-            np.matrix.sum(np.power(expected_output - vt, 2)) * 1 / len(expected_output.T)
-        )
+        error = np.matrix.sum(np.power(expected_output - vt, 2)) * 1 / len(expected_output.T)
+        # Early stopping
+        error, min_error, counter, epoch, result = utils.early_stopping(error, min_error, counter, epoch)
+        if result: break
+
+        v_errors.append(error)
 
     print(utils.computes_accuracy(vt, expected_output))
 
@@ -68,6 +74,9 @@ def run(training, validation, input_size, lambda_reg, alpha_momentum, topology, 
                     alpha_momentum, epochs, duration_in_sec, my_nn)
     return
 
+
+if len(sys.argv) < 2:
+    raise Exception("Input Error")
 
 input_file = sys.argv[1]
 
