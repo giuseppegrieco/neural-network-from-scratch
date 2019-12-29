@@ -1,34 +1,35 @@
 {
-  "input_size": 17,
+  "input_size": 20,
   "epochs": 1500,
-  "training_file": "monks-3.train",
+  "training_file": "cup/tr.csv",
   "validation_file": "monks-3.test",
-  "learning_rate": [0.1],
-  "lambda_regularization": [0.0],
+  "learning_rate": [0.0001],
+  "lambda_regularization": [0.001],
   "alpha_momentum": [0.5],
   "learning_algorithm": "gradient_descent",
   "topology":
     [
       [
         {
-        "nodes": 2,
+        "nodes": 20,
         "activation_function": "Sigmoid"
         },
         {
-          "nodes": 1,
-          "activation_function": "Sigmoid"
+          "nodes": 2,
+          "activation_function": "Identity"
         }
       ],
       [
         {
-        "nodes": 4,
+        "nodes": 50,
         "activation_function": "Sigmoid"
         },
         {
-          "nodes": 1,
-          "activation_function": "Sigmoid"
+          "nodes": 2,
+          "activation_function": "Identity"
         }
       ]
     ],
-  "thread_number" : 4
+  "thread_number" : 4,
+  "folds": 5
 }

@@ -11,6 +11,7 @@ from .layer import Layer
 from .activation_function import *
 from .learning_algorithm import *
 from .utils import *
+from grid_search import grid_search
 
 # Import able to access:
 __all__ = [
@@ -24,5 +25,5 @@ __all__ = [
     'convert_in_numpy',
     'save_graph',
     'utils',
-
+    'grid_search'
 ]

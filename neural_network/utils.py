@@ -6,15 +6,74 @@ import json
 import neural_network as nn
 
 
+def split_k_fold(input_list, output_list, k):
+    size = int(np.rint(len(input_list) / k))
+    folds = []
+    for i in range(0, k):
+        lr_limit = size * i
+        up_limit = (size + size * i) if i != k - 1 else len(input_list)
+        folds.append([
+            input_list[lr_limit:up_limit],
+            output_list[lr_limit:up_limit]
+        ])
+    return folds
+
+
+def retrieves_fold_k(folds, k):
+    tr_in = []
+    tr_out = []
+    for i in range(0, len(folds)):
+        if i != k - 1:
+            tr_in = tr_in + folds[i][0]
+            tr_out = tr_out + folds[i][1]
+    vn_in = folds[k - 1][0]
+    vn_out = folds[k - 1][1]
+    return tr_in, tr_out, vn_in, vn_out
+
+
+def split_training_test(input_list, output_list, tr_size):
+    tr_size = int(np.rint(len(input_list) * tr_size))
+    tr_in = input_list[:tr_size]
+    tr_out = output_list[:tr_size]
+    ts_in = input_list[tr_size:]
+    ts_out = output_list[tr_size:]
+    return tr_in, tr_out, ts_in, ts_out
+
+
+def save_in_csv(input_list, output_list, file_name):
+    with open(file_name, 'w', newline='') as file:
+        writer = csv.writer(file)
+        for i in range(0, len(input_list)):
+            writer.writerow([i + 1] + input_list[i] + output_list[i])
+
+
+def cup_parser(file_name):
+    index = 0
+    input_list = []
+    output_list = []
+    with open(file_name) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+
+        for row in csv_reader:
+            value = []
+            for i in range(1, 21):
+                value.append(float(row[i]))
+            input_list.append(value)
+            output_list.append([float(row[21]), float(row[22])])
+            index = index + 1
+        csv_file.close()
+        return input_list, output_list
+
+
 def convert_in_numpy(target):
     if isinstance(target, list) and not isinstance(target[0], list):
         target = [1] + target
-        target = np.array(target, dtype=float)
+        target = np.array(target, dtype=np.dtype('d'))
         return target.reshape((len(target), 1))
     else:
-        target = np.array(target)
+        target = np.array(target, dtype=np.dtype('d'))
         n, m = target.shape
-        bias = np.ones((1, m))
+        bias = np.ones((1, m), dtype=np.dtype('d'))
         return np.vstack((bias, target))
 
 
@@ -74,7 +133,7 @@ def computes_accuracy(targets, expected_output):
         else:
             res.append(0.0)
 
-    all_wrong_output = np.matrix.sum(abs(np.mat(res) - expected_output))
+    all_wrong_output = np.matrix.sum(abs(np.mat(res, dtype=np.dtype('d')) - expected_output))
     m, n = targets.shape
     return 1.0 - (all_wrong_output / n)
 
@@ -149,8 +208,9 @@ def read_input(data):
     topologies = data["topology"]
     a_topology = get_topology_from_json(topologies)
     thread_number = data['thread_number']
+    folds = data["folds"]
 
-    return input_size, training_file, validation_file, epochs, a_eta, a_lambda_reg, a_alpha_momentum, learning_algorithm, a_topology, thread_number
+    return input_size, training_file, validation_file, epochs, a_eta, a_lambda_reg, a_alpha_momentum, learning_algorithm, a_topology, thread_number, folds
 
 
 def early_stopping(error, min_error, counter, epoch):

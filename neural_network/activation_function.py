@@ -35,7 +35,7 @@ class Identity(ActivationFunction):
         return x
 
     def f_derivative(self, x):
-        return np.ones(x.shape)
+        return np.ones(x.shape, dtype=np.dtype('d'))
 
 class Sigmoid(ActivationFunction):
 

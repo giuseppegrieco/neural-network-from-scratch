@@ -43,7 +43,7 @@ class GradientDescent(LearningAlgorithm):
 
         # reshape target vector as column vector
 
-        expected_output = np.mat(np.array(expected_output))
+        expected_output = np.mat(np.array(expected_output), dtype=np.dtype('d'))
 
         self.__back_propagation(
             neural_network,
@@ -105,7 +105,7 @@ class GradientDescent(LearningAlgorithm):
         delta_layer = (self.__learning_rate * delta) +\
                       (self.__alpha_momentum * layer.get_delta_old())
         layer_weights = layer.get_weights()
-        lambda_mat = np.full(layer_weights.shape, -self.__lambda_regularization)
+        lambda_mat = np.full(layer_weights.shape, -self.__lambda_regularization, dtype=np.dtype('d'))
         if layer.get_is_hidden():
             lambda_mat[:, 0] = 0.0
         delta_layer = delta_layer + np.multiply(lambda_mat, layer_weights)

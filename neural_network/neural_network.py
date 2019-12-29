@@ -26,17 +26,20 @@ class NeuralNetwork:
         # TODO: Check activation function learning algorithm
         self.__learning_algorithm = learning_algorithm
 
-        self.__init_weights()
+        self.init_weights()
 
-    def __init_weights(self):
+    def init_weights(self):
         previous_nodes = self.__input_size
 
         for layer in self.__topology:
             layer.set_weights(
                 np.random.normal(0, 1 / np.sqrt(1 + previous_nodes), (layer.get_nodes(), 1 + previous_nodes))
             )
+            layer.set_weights(
+                layer.get_weights().astype(np.dtype('d'))
+            )
             layer.set_delta_old(
-                np.zeros((layer.get_nodes(), 1 + previous_nodes))
+                np.zeros((layer.get_nodes(), 1 + previous_nodes), dtype=np.dtype('d'))
             )
             previous_nodes = layer.get_nodes()
             layer.set_is_hidden(1)
@@ -50,7 +53,7 @@ class NeuralNetwork:
             t_errors.append(self.train(input_data, expected_output))
             c_errors.append(
                 np.matrix.sum(np.power(compare_output - self.feed_forward(compare_data), 2)) * 1 / len(
-                    np.mat(compare_output).T
+                    np.mat(compare_output, dtype=np.dtype('d')).T
                 )
             )
         return t_errors, c_errors
