@@ -9,17 +9,28 @@ import csv
 import json
 import neural_network as nn
 import datetime
+import random
 
 
 def split_k_fold(input_list, output_list, k):
-    size = int(np.rint(len(input_list) / k))
+    mat_to_shuffle = input_list.copy()
+    for i in range(0, len(mat_to_shuffle)):
+        mat_to_shuffle[i] = mat_to_shuffle[i] + output_list[i]
+    random.shuffle(mat_to_shuffle)
+    ins_l = []
+    outs_l = []
+    for i in range(0, len(mat_to_shuffle)):
+        ins_l.append(mat_to_shuffle[i][:20])
+        outs_l.append(mat_to_shuffle[i][20:])
+
+    size = int(np.rint(len(ins_l) / k))
     folds = []
     for i in range(0, k):
         lr_limit = size * i
-        up_limit = (size + size * i) if i != k - 1 else len(input_list)
+        up_limit = (size + size * i) if i != k - 1 else len(ins_l)
         folds.append([
-            input_list[lr_limit:up_limit],
-            output_list[lr_limit:up_limit]
+            ins_l[lr_limit:up_limit],
+            outs_l[lr_limit:up_limit]
         ])
     return folds
 
@@ -173,8 +184,8 @@ def create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec,
 
 def save_data(directory_name, tr_errors, v_errors, final_weights, initial_weights, eta, lambda_reg, alpha_momentum,
               my_nn, index_fold):
-    save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, "/charts/", directory_name.rsplit('/')[-2] + "-" + str(index_fold),
-               my_nn.get_number_of_nodes())
+    #save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, "/charts/", directory_name.rsplit('/')[-2] + "-" + str(index_fold),
+     #          my_nn.get_number_of_nodes())
     save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum,
                "/grid_search/" + directory_name + "fold-" + str(index_fold), "/plot", my_nn.get_number_of_nodes())
 
@@ -227,15 +238,23 @@ def read_input(data):
     return is_cup, input_size, training_file, validation_file, epochs, a_eta, a_lambda_reg, a_alpha_momentum, learning_algorithm, a_topology, thread_number, folds
 
 
-def early_stopping(error, min_error, counter, epoch):
+def early_stopping(prec_error, error, min_error, f_counter, s_counter, epoch):
     res = False
+    if error - prec_error < 0.01:
+        if f_counter == 0:
+            res = True
+        f_counter = f_counter - 1
+    else:
+        f_counter = 100
+
     if error < min_error:
         min_error = error
+        s_counter = 100
     elif epoch > 200:  # TODO: metti una variabile o qualocsa
-        if counter == 1:
+        if s_counter == 1:
             res = True
-        counter = counter - 1
-    return error, min_error, counter, epoch, res
+        s_counter = s_counter - 1
+    return error, min_error, f_counter, s_counter, epoch, res
 
 
 def create_timestamp_directory(path, prefix):  # todo: mettere secondo camnpo non obbligatiorio

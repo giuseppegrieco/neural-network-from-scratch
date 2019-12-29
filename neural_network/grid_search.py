@@ -3,7 +3,7 @@
 
   see https://en.wikipedia.org/wiki/Activation_function
 """
-from concurrent.futures.process import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from tornado import concurrent
 
 import neural_network as nn
@@ -28,40 +28,37 @@ def grid_search(
         thread_number,
         k
 ):
-    folds = utils.split_k_fold(tr_input, tr_output, k)
-
-    training = (tr_input, tr_output)
-    thread_executor = ProcessPoolExecutor(thread_number)
-
     start_time_GS = datetime.datetime.now().timestamp()
     directory_name_GS = utils.create_timestamp_directory("./grid_search/", prefix="GS-")
     directory_name_GS = directory_name_GS + "/"
     futures = []
 
-    # Generate all possible combinations
-    for topology in a_topology:  # TODO: forse è meglio mettere come primo for la topologia
-        for lambda_reg in a_lambda_reg:
-            for alpha_momentum in a_alpha_momentum:
-                for eta in a_eta:
-                    __run(
-                        folds,
-                        input_size,
-                        lambda_reg,
-                        alpha_momentum,
-                        topology,
-                        epochs,
-                        eta,
-                        learning_algorithm,
-                        directory_name_GS)
+    with ProcessPoolExecutor(max_workers=thread_number) as executor:
+        # Generate all possible combinations
+        for topology in a_topology:  # TODO: forse è meglio mettere come primo for la topologia
+            for lambda_reg in a_lambda_reg:
+                for alpha_momentum in a_alpha_momentum:
+                    for eta in a_eta:
+                        folds = utils.split_k_fold(tr_input, tr_output, k)
+                        executor.submit(
+                            __run,
+                            folds,
+                            input_size,
+                            lambda_reg,
+                            alpha_momentum,
+                            topology,
+                            epochs,
+                            eta,
+                            learning_algorithm,
+                            directory_name_GS
+                        )
+        executor.shutdown()
 
-    concurrent.futures.wait(futures)
-    thread_executor.shutdown()
-
-    end_time_GS = datetime.datetime.now().timestamp()
-    grid_search_duration_in_sec = end_time_GS - start_time_GS
-    data = {'duration_GS': grid_search_duration_in_sec}
-    with open("./grid_search/" + directory_name_GS + 'data.json', 'w') as fp:
-        json.dump(data, fp)
+        end_time_GS = datetime.datetime.now().timestamp()
+        grid_search_duration_in_sec = end_time_GS - start_time_GS
+        data = {'duration_GS': grid_search_duration_in_sec}
+        with open("./grid_search/" + directory_name_GS + 'data.json', 'w') as fp:
+            json.dump(data, fp)
 
 
 def __run(
@@ -106,8 +103,10 @@ def __run(
         tr_output = np.mat(data=tr_out, dtype=np.dtype('d')).T
         vn_output = np.mat(data=vn_out, dtype=np.dtype('d')).T
 
+        prec_error = sys.float_info.max
         min_error = sys.float_info.max
-        counter = 20
+        f_counter = 100
+        s_counter = 100
         for epoch in range(1, epochs + 1):
             error = learning_algorithm(
                 my_nn,
@@ -127,10 +126,12 @@ def __run(
             ) * 1 / len(expected_output.T)
 
             # Early stopping
-            error, min_error, counter, epoch, result = utils.early_stopping(
+            prec_error, min_error, f_counter, s_counter, epoch, result = utils.early_stopping(
+                prec_error,
                 error,
                 min_error,
-                counter,
+                f_counter,
+                s_counter,
                 epoch
             )
 
@@ -160,7 +161,8 @@ def __run(
             lambda_reg,
             alpha_momentum,
             my_nn,
-            folds_index)
+            folds_index
+        )
 
         my_nn.init_weights()
 
