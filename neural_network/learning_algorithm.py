@@ -67,8 +67,9 @@ class GradientDescent(LearningAlgorithm):
         # error of each output nodes
         delta = (target - output)
 
-        delta = np.multiply(delta, output_layer.get_activation_function().f_derivative(
-            output_layer.get_net()
+        delta = np.multiply(delta, output_layer.get_activation_function()(
+            output_layer.get_net(),
+            derivative=True
         ))
 
         # adjusting delta of weights between last hidden layer and the output layer
@@ -81,8 +82,9 @@ class GradientDescent(LearningAlgorithm):
         for hidden_layer_index in range(len(hidden_layers) - 1, 0, -1):
             delta = delta.T * previous_weights
             delta = delta[:, 1:]
-            delta = np.multiply(delta.T, hidden_layers[hidden_layer_index].get_activation_function().f_derivative(
-                hidden_layers[hidden_layer_index].get_net()
+            delta = np.multiply(delta.T, hidden_layers[hidden_layer_index].get_activation_function()(
+                hidden_layers[hidden_layer_index].get_net(),
+                derivative=True
             ))
 
             # adjusting delta of weights between two hidden layers
@@ -92,8 +94,9 @@ class GradientDescent(LearningAlgorithm):
 
         delta = delta.T * previous_weights
         delta = delta[:, 1:]
-        delta = np.multiply(delta.T, hidden_layers[0].get_activation_function().f_derivative(
-            hidden_layers[0].get_net()
+        delta = np.multiply(delta.T, hidden_layers[0].get_activation_function()(
+            hidden_layers[0].get_net(),
+            derivative=True
         ))
 
         # adjusting delta of weights between last hidden layer and the output layer

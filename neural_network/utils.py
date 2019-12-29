@@ -1,3 +1,7 @@
+"""
+  The follow functions provide a set of useful procedures for using the module
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -189,9 +193,12 @@ def read_input(data):
             for layer in topology:
                 nodes = layer['nodes']
                 if layer['activation_function'] == 'Sigmoid':
-                    activation_function = nn.Sigmoid()
-                else:
-                    activation_function = nn.Identity()  # TODO: add all functions
+                    activation_function = nn.sigmoid
+                if layer['activation_function'] == 'Identity':
+                    activation_function = nn.identity
+                if layer['activation_function'] == "Tanh":
+                    activation_function = nn.tanh
+                # TODO: add all functions
                 layers.append(nn.Layer(nodes=nodes, activation_function=activation_function))
             all_topologies.append(layers)
 

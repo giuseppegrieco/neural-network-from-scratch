@@ -1,3 +1,8 @@
+"""
+  The follow functions provide an implementation of grid-search with k-fold cross-validation.
+
+  see https://en.wikipedia.org/wiki/Activation_function
+"""
 from concurrent.futures.process import ProcessPoolExecutor
 from tornado import concurrent
 import neural_network as nn
@@ -97,7 +102,13 @@ def __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta):
             ) * 1 / len(expected_output.T)
 
             # Early stopping
-            error, min_error, counter, epoch, result = utils.early_stopping(error, min_error, counter, epoch)
+            error, min_error, counter, epoch, result = utils.early_stopping(
+                error,
+                min_error,
+                counter,
+                epoch
+            )
+
             if result:
                 break
 
@@ -134,4 +145,5 @@ def __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta):
     for error in final_errors:
         variance = variance + np.square(error - average)
 
+    #TODO save this
     return average / len(folds), variance / len(folds)
