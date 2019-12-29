@@ -11,6 +11,7 @@ import numpy as np
 import sys
 import datetime
 import os
+import json
 
 
 def grid_search(input_size,
@@ -30,6 +31,8 @@ def grid_search(input_size,
     thread_executor = ProcessPoolExecutor(thread_number)
 
     start_time_GS = datetime.datetime.now().timestamp()
+    directory_name_GS = utils.create_timestamp_directory("./grid_search/", prefix="GS-")
+    directory_name_GS = directory_name_GS + "/"
     futures = []
 
     # Generate all possible combinations
@@ -37,28 +40,22 @@ def grid_search(input_size,
         for lambda_reg in a_lambda_reg:
             for alpha_momentum in a_alpha_momentum:
                 for eta in a_eta:
-                    __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta)
-
+                    __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta,directory_name_GS)
 
     concurrent.futures.wait(futures)
     thread_executor.shutdown()
 
     end_time_GS = datetime.datetime.now().timestamp()
-    grid_search_duration_in_sec = end_time_GS - start_time_GS  # TODO: ha senso salvarla?
+    grid_search_duration_in_sec = end_time_GS - start_time_GS
+    data = {'duration_GS': grid_search_duration_in_sec}
+    with open("./grid_search/" + directory_name_GS + 'data.json', 'w') as fp:
+        json.dump(data, fp)
 
 
-def __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta):
-    def create_timestamp_directory():
-        directory_name = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-        try:
-            os.mkdir("grid_search/" + directory_name)
-        except FileExistsError as e:
-            print(e)
-        return directory_name
-
+def __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta, initial_path):
     start_time = datetime.datetime.now().timestamp()
-    directory_name = create_timestamp_directory()
-
+    directory_name = utils.create_timestamp_directory("./grid_search/" + initial_path, "")
+    directory_name = initial_path + directory_name + "/"
     my_nn = nn.NeuralNetwork(
         input_size=input_size,
         topology=topology,
@@ -68,12 +65,16 @@ def __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta):
             alpha_momentum=alpha_momentum
         )
     )
-
     average = 0
     final_errors = []
 
     for folds_index in range(1, len(folds) + 1):
-        print(folds_index)
+
+        fold_directory_name = "./grid_search/" + directory_name + "fold-" + str(folds_index) + "/"
+        try:
+            os.mkdir(fold_directory_name)
+        except FileExistsError as e:
+            raise e
         tr_in, tr_out, vn_in, vn_out = utils.retrieves_fold_k(
             folds,
             folds_index
@@ -134,16 +135,20 @@ def __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta):
             eta,
             lambda_reg,
             alpha_momentum,
-            epochs,
-            duration_in_sec,
-            my_nn)
+            my_nn,
+            folds_index)
 
         my_nn.init_weights()
 
     variance = 0
-
+    average = average / len(folds)
     for error in final_errors:
         variance = variance + np.square(error - average)
 
-    #TODO save this
-    return average / len(folds), variance / len(folds)
+    variance = variance / len(folds)
+
+
+    utils.create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec, my_nn.get_topology(),
+                             "./grid_search/" + directory_name,average,variance)
+
+    return average, variance

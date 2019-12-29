@@ -10,8 +10,8 @@ input_file = sys.argv[1]
 
 with open('./experiments/' + input_file, 'r') as fp:
     data = json.load(fp)
-
-input_size, \
+is_cup,\
+    input_size, \
     training_file, \
     validation_file, \
     epochs, \
@@ -24,12 +24,11 @@ input_size, \
     k = utils.read_input(data)
 
 
-if True:
+if is_cup:
     tr_input, tr_output = utils.cup_parser(training_file)
-    # ts_input, ts_output = utils.cup_parser(validation_file)
 else:
     tr_input, tr_output = utils.monk_parser(training_file)
-    # ts_input, ts_output = utils.monk_parser(validation_file)
+
 
 nn.grid_search(
     input_size,

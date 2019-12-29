@@ -8,6 +8,7 @@ import os
 import csv
 import json
 import neural_network as nn
+import datetime
 
 
 def split_k_fold(input_list, output_list, k):
@@ -104,7 +105,7 @@ def save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, path, file_
     try:
         fig.savefig(os.path.dirname(my_path) + path + file_name)
     except Exception as e:
-        print(e)
+        raise e
 
 
 def monk_parser(file_name):
@@ -142,7 +143,7 @@ def computes_accuracy(targets, expected_output):
     return 1.0 - (all_wrong_output / n)
 
 
-def create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec, topology, path):
+def create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec, topology, path,average,variance):
     data = \
         {
             'learning_algorithm':
@@ -154,7 +155,9 @@ def create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec,
                 },
             'topology': {},
             'epochs': epochs,
-            'duration_sec': duration_in_sec
+            'duration_sec': duration_in_sec,
+            'average': average,
+            'variance': variance
         }
 
     index = 0
@@ -164,25 +167,24 @@ def create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec,
         data['topology'][str(index)] = {'nodes': layer.get_nodes(), 'activation_function': activation_function_name}
         index = index + 1
 
-    with open(path + '/data.json', 'w') as fp:
+    with open(path + 'data.json', 'w') as fp:
         json.dump(data, fp)
 
 
 def save_data(directory_name, tr_errors, v_errors, final_weights, initial_weights, eta, lambda_reg, alpha_momentum,
-              epochs, duration_in_sec, my_nn):
-    save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, "/charts/",
-               directory_name, my_nn.get_number_of_nodes())
+              my_nn, index_fold):
+    save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, "/charts/", directory_name.rsplit('/')[-2] + "-" + str(index_fold),
+               my_nn.get_number_of_nodes())
     save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum,
-               "/grid_search/" + directory_name + "/", directory_name, my_nn.get_number_of_nodes())
+               "/grid_search/" + directory_name + "fold-" + str(index_fold), "/plot", my_nn.get_number_of_nodes())
 
-    np.save("./grid_search/" + directory_name + "/training_error", np.mat(tr_errors))
-    np.save("./grid_search/" + directory_name + "/validation_error", np.mat(v_errors))
+    np.save("./grid_search/" + directory_name + "fold-" + str(index_fold) + "/training_error", np.mat(tr_errors))
+    np.save("./grid_search/" + directory_name + "fold-" + str(index_fold) + "/validation_error", np.mat(v_errors))
 
-    np.save("./grid_search/" + directory_name + "/initial_weights", initial_weights)  # TODO: codice eseguibile
-    np.save("./grid_search/" + directory_name + "/final_weights", final_weights)  # TODO: codice eseguibile
-
-    create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec, my_nn.get_topology(),
-                       './grid_search/' + directory_name + '/')
+    np.save("./grid_search/" + directory_name + "fold-" + str(index_fold) + "/initial_weights",
+            initial_weights)  # TODO: codice eseguibile
+    np.save("./grid_search/" + directory_name + "fold-" + str(index_fold) + "/final_weights",
+            final_weights)  # TODO: codice eseguibile
 
 
 def read_input(data):
@@ -204,6 +206,7 @@ def read_input(data):
 
         return all_topologies
 
+    is_cup = data['is_cup']
     input_size = data['input_size']
     training_file = data['training_file']
     validation_file = data['validation_file']
@@ -217,7 +220,7 @@ def read_input(data):
     thread_number = data['thread_number']
     folds = data["folds"]
 
-    return input_size, training_file, validation_file, epochs, a_eta, a_lambda_reg, a_alpha_momentum, learning_algorithm, a_topology, thread_number, folds
+    return is_cup, input_size, training_file, validation_file, epochs, a_eta, a_lambda_reg, a_alpha_momentum, learning_algorithm, a_topology, thread_number, folds
 
 
 def early_stopping(error, min_error, counter, epoch):
@@ -229,3 +232,12 @@ def early_stopping(error, min_error, counter, epoch):
             res = True
         counter = counter - 1
     return error, min_error, counter, epoch, res
+
+
+def create_timestamp_directory(path, prefix):  # todo: mettere secondo camnpo non obbligatiorio
+    directory_name = prefix + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+    try:
+        os.mkdir(path + directory_name)
+    except FileExistsError as e:
+        raise e
+    return directory_name

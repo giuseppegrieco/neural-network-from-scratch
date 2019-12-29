@@ -1,7 +1,8 @@
 {
+  "is_cup": true,
   "input_size": 20,
-  "epochs": 1500,
-  "training_file": "cup/tr.csv",
+  "epochs": 15000,
+  "training_file": "ML-CUP19-TR.csv",
   "validation_file": "monks-3.test",
   "learning_rate": [0.0001],
   "lambda_regularization": [0.001],
