@@ -1,15 +1,14 @@
 """
-    This module provide the concept of Neural Network's Full-connected-layer
+This module provides the concept of Neural Network's Full-connected-layer
 """
 from .utils import convert_in_numpy
 
-import numpy as np
 
 class Layer:
     """
-        This class is an abstraction of Neural Network's full-connected-layer
-        concept, encapsulates the state of a layer and provides a public interface
-        to retrieves the output of the layer
+    This class is an abstraction of Neural Network's full-connected-layer
+    concept, encapsulates the state of a layer and provides a public interface
+    to retrieves the output of the layer
     """
     def __init__(self, nodes, activation_function):
         """

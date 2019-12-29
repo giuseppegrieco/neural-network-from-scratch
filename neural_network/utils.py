@@ -201,7 +201,10 @@ def read_input(data):
                 if layer['activation_function'] == "Tanh":
                     activation_function = nn.tanh
                 # TODO: add all functions
-                layers.append(nn.Layer(nodes=nodes, activation_function=activation_function))
+                layers.append(nn.Layer(
+                    nodes=nodes,
+                    activation_function=activation_function
+                ))
             all_topologies.append(layers)
 
         return all_topologies
@@ -214,7 +217,8 @@ def read_input(data):
     a_eta = data["learning_rate"]
     a_lambda_reg = data["lambda_regularization"]
     a_alpha_momentum = data["alpha_momentum"]
-    learning_algorithm = data["learning_algorithm"]  # TODO: check
+    from neural_network import gradient_descent
+    learning_algorithm = gradient_descent  # TODO: check
     topologies = data["topology"]
     a_topology = get_topology_from_json(topologies)
     thread_number = data['thread_number']

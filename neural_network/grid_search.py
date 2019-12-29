@@ -5,6 +5,7 @@
 """
 from concurrent.futures.process import ProcessPoolExecutor
 from tornado import concurrent
+
 import neural_network as nn
 import neural_network.utils as utils
 import numpy as np
@@ -14,17 +15,19 @@ import os
 import json
 
 
-def grid_search(input_size,
-                tr_input,
-                tr_output,
-                epochs,
-                a_eta,
-                a_lambda_reg,
-                a_alpha_momentum,
-                learning_algorithm,
-                a_topology,
-                thread_number,
-                k):
+def grid_search(
+        input_size,
+        tr_input,
+        tr_output,
+        epochs,
+        a_eta,
+        a_lambda_reg,
+        a_alpha_momentum,
+        learning_algorithm,
+        a_topology,
+        thread_number,
+        k
+):
     folds = utils.split_k_fold(tr_input, tr_output, k)
 
     training = (tr_input, tr_output)
@@ -40,7 +43,16 @@ def grid_search(input_size,
         for lambda_reg in a_lambda_reg:
             for alpha_momentum in a_alpha_momentum:
                 for eta in a_eta:
-                    __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta,directory_name_GS)
+                    __run(
+                        folds,
+                        input_size,
+                        lambda_reg,
+                        alpha_momentum,
+                        topology,
+                        epochs,
+                        eta,
+                        learning_algorithm,
+                        directory_name_GS)
 
     concurrent.futures.wait(futures)
     thread_executor.shutdown()
@@ -52,18 +64,23 @@ def grid_search(input_size,
         json.dump(data, fp)
 
 
-def __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta, initial_path):
+def __run(
+        folds,
+        input_size,
+        lambda_reg,
+        alpha_momentum,
+        topology,
+        epochs,
+        eta,
+        learning_algorithm,
+        initial_path
+):
     start_time = datetime.datetime.now().timestamp()
     directory_name = utils.create_timestamp_directory("./grid_search/" + initial_path, "")
     directory_name = initial_path + directory_name + "/"
     my_nn = nn.NeuralNetwork(
         input_size=input_size,
-        topology=topology,
-        learning_algorithm=nn.GradientDescent(
-            learning_rate=eta,
-            lambda_regularization=lambda_reg,
-            alpha_momentum=alpha_momentum
-        )
+        topology=topology
     )
     average = 0
     final_errors = []
@@ -92,7 +109,14 @@ def __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta, 
         min_error = sys.float_info.max
         counter = 20
         for epoch in range(1, epochs + 1):
-            error = my_nn.train(tr_input, tr_output)
+            error = learning_algorithm(
+                my_nn,
+                tr_input,
+                tr_output,
+                eta,
+                lambda_reg,
+                alpha_momentum
+            )
             tr_errors.append(error)
 
             vt = my_nn.feed_forward(vn_input)
@@ -147,8 +171,16 @@ def __run(folds, input_size, lambda_reg, alpha_momentum, topology, epochs, eta, 
 
     variance = variance / len(folds)
 
-
-    utils.create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec, my_nn.get_topology(),
-                             "./grid_search/" + directory_name,average,variance)
+    utils.create_output_json(
+        eta,
+        lambda_reg,
+        alpha_momentum,
+        epochs,
+        duration_in_sec,
+        my_nn.get_topology(),
+        "./grid_search/" + directory_name,
+        average,
+        variance
+    )
 
     return average, variance

@@ -1,7 +1,7 @@
 """
-  The follow functions provide an implementation for activation function of a node.
+The follow functions provide an implementation for activation function of a node.
 
-  see https://en.wikipedia.org/wiki/Activation_function
+see https://en.wikipedia.org/wiki/Activation_function
 """
 import numpy as np
 
