@@ -186,8 +186,8 @@ def save_data(directory_name, tr_errors, v_errors, final_weights, initial_weight
               my_nn, index_fold):
     #save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum, "/charts/", directory_name.rsplit('/')[-2] + "-" + str(index_fold),
      #          my_nn.get_number_of_nodes())
-    save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum,
-               "/grid_search/" + directory_name + "fold-" + str(index_fold), "/plot", my_nn.get_number_of_nodes())
+    #save_graph(tr_errors, v_errors, eta, lambda_reg, alpha_momentum,
+     #          "/grid_search/" + directory_name + "fold-" + str(index_fold), "/plot", my_nn.get_number_of_nodes())
 
     np.save("./grid_search/" + directory_name + "fold-" + str(index_fold) + "/training_error", np.mat(tr_errors))
     np.save("./grid_search/" + directory_name + "fold-" + str(index_fold) + "/validation_error", np.mat(v_errors))
@@ -242,7 +242,7 @@ def early_stopping(prec_error, error, min_error, f_counter, s_counter, epoch):
     res = False
     if error - prec_error < 0.01:
         if f_counter == 0:
-            res = True
+            res = False
         f_counter = f_counter - 1
     else:
         f_counter = 100

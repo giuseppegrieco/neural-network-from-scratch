@@ -1,7 +1,7 @@
 {
   "is_cup": true,
   "input_size": 20,
-  "epochs": 100,
+  "epochs": 15000,
   "training_file": "cup/tr.csv",
   "validation_file": "monks-3.test",
   "learning_rate": [
