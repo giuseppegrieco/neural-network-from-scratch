@@ -240,7 +240,7 @@ def read_input(data):
 
 def early_stopping(prec_error, error, min_error, f_counter, s_counter, epoch):
     res = False
-    if error > 15000 / (epoch + 1):
+    if error > 75000 / (epoch + 1):
         if f_counter == 0:
             res = True
         f_counter = f_counter - 1
