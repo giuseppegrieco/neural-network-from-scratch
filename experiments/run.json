@@ -18,36 +18,6 @@
     [
       [
         {
-        "nodes": 10,
-        "activation_function": "Sigmoid"
-        },
-        {
-          "nodes": 2,
-          "activation_function": "Identity"
-        }
-      ],
-      [
-        {
-        "nodes": 50,
-        "activation_function": "Sigmoid"
-        },
-        {
-          "nodes": 2,
-          "activation_function": "Identity"
-        }
-      ],
-      [
-        {
-        "nodes": 100,
-        "activation_function": "Sigmoid"
-        },
-        {
-          "nodes": 2,
-          "activation_function": "Identity"
-        }
-      ],
-      [
-        {
         "nodes": 150,
         "activation_function": "Sigmoid"
         },
