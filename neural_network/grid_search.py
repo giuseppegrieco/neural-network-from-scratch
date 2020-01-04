@@ -108,7 +108,7 @@ def __run(
         f_counter = 100
         s_counter = 100
         for epoch in range(1, epochs + 1):
-            error = learning_algorithm(
+            training_error = learning_algorithm(
                 my_nn,
                 tr_input,
                 tr_output,
@@ -116,19 +116,19 @@ def __run(
                 lambda_reg,
                 alpha_momentum
             )
-            tr_errors.append(error)
+
 
             vt = my_nn.feed_forward(vn_input)
             expected_output = np.mat(vn_output, dtype=np.dtype('d'))
 
-            error = np.matrix.sum(
+            validation_error = np.matrix.sum(
                 np.power(expected_output - vt, 2)
             ) * 1 / len(expected_output.T)
 
             # Early stopping
             prec_error, min_error, f_counter, s_counter, epoch, result = utils.early_stopping(
                 prec_error,
-                error,
+                validation_error,
                 min_error,
                 f_counter,
                 s_counter,
@@ -138,7 +138,8 @@ def __run(
             if result:
                 break
 
-            v_errors.append(error)
+            tr_errors.append(training_error)
+            v_errors.append(validation_error)
 
         tr_errors.pop(0)
         v_errors.pop(0)
@@ -168,8 +169,8 @@ def __run(
 
     variance = 0
     average = average / len(folds)
-    for error in final_errors:
-        variance = variance + np.square(error - average)
+    for validation_error in final_errors:
+        variance = variance + np.square(validation_error - average)
 
     variance = variance / len(folds)
 
