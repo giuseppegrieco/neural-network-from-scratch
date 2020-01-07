@@ -4,20 +4,168 @@
   "epochs": 15000,
   "training_file": "cup/tr.csv",
   "validation_file": "monks-3.test",
+
+
+
   "learning_rate": [
-      0.0001, 0.00009, 0.00006, 0.00003, 0.00001, 0.000009, 0.000006, 0.000003
+     0.00025, 0.0002, 0.0001, 0.00001, 0.000001, 0.0000001
   ],
   "lambda_regularization": [
-      0.0007, 0.0004, 0.0001
+       0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001
 
   ],
   "alpha_momentum": [
-      0.9, 0.7, 0.6, 0.5, 0.3, 0.1
+      0.9, 0.6, 0.3, 0.1, 0
   ],
   "learning_algorithm": "gradient_descent",
   "topology":
+
     [
       [
+        {
+        "nodes": 10,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 10,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 10,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 30,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 10,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 50,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 30,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 10,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 30,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 30,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 30,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 50,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 50,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 10,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 50,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 30,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 50,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 50,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 100,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 100,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 100,
+        "activation_function": "Sigmoid"
+        },
         {
         "nodes": 150,
         "activation_function": "Sigmoid"
@@ -29,7 +177,53 @@
       ],
       [
         {
-        "nodes": 175,
+        "nodes": 100,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 200,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 150,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 100,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 150,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 150,
+        "activation_function": "Sigmoid"
+        },
+        {
+          "nodes": 2,
+          "activation_function": "Identity"
+        }
+      ],
+      [
+        {
+        "nodes": 150,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 200,
         "activation_function": "Sigmoid"
         },
         {
@@ -43,13 +237,7 @@
         "activation_function": "Sigmoid"
         },
         {
-          "nodes": 2,
-          "activation_function": "Identity"
-        }
-      ],
-      [
-        {
-        "nodes": 225,
+        "nodes": 100,
         "activation_function": "Sigmoid"
         },
         {
@@ -59,7 +247,11 @@
       ],
       [
         {
-        "nodes": 250,
+        "nodes": 200,
+        "activation_function": "Sigmoid"
+        },
+        {
+        "nodes": 150,
         "activation_function": "Sigmoid"
         },
         {
@@ -69,27 +261,11 @@
       ],
       [
         {
-        "nodes": 275,
+        "nodes": 200,
         "activation_function": "Sigmoid"
         },
         {
-          "nodes": 2,
-          "activation_function": "Identity"
-        }
-      ],
-      [
-        {
-        "nodes": 300,
-        "activation_function": "Sigmoid"
-        },
-        {
-          "nodes": 2,
-          "activation_function": "Identity"
-        }
-      ],
-      [
-        {
-        "nodes": 325,
+        "nodes": 200,
         "activation_function": "Sigmoid"
         },
         {
