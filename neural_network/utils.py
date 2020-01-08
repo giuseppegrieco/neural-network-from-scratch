@@ -242,7 +242,7 @@ def early_stopping(prec_error, error, min_error, f_counter, s_counter, epoch):
     res = False
     if error > 75000 / (epoch + 1):
         if f_counter == 0:
-            res = True
+            res = False
         f_counter = f_counter - 1
     else:
         f_counter = 100
@@ -252,7 +252,7 @@ def early_stopping(prec_error, error, min_error, f_counter, s_counter, epoch):
         s_counter = 100
     elif epoch > 200:  # TODO: metti una variabile o qualocsa
         if s_counter == 1:
-            res = True
+            res = False
         s_counter = s_counter - 1
     return error, min_error, f_counter, s_counter, epoch, res
 

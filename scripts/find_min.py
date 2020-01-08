@@ -23,4 +23,4 @@ for directory in list:
 
 print("min: " + str(min))
 print("directory name: " + minDirectoryName)
-print(obj)
+print(all)
