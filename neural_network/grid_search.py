@@ -121,9 +121,9 @@ def __run(
             vt = my_nn.feed_forward(vn_input)
             expected_output = np.mat(vn_output, dtype=np.dtype('d'))
 
-            validation_error = np.matrix.sum(
+            validation_error = np.matrix.mean(
                 np.power(expected_output - vt, 2)
-            ) * 1 / len(expected_output.T)
+            )
 
             # Early stopping
             prec_error, min_error, f_counter, s_counter, epoch, result = utils.early_stopping(
@@ -144,8 +144,8 @@ def __run(
         tr_errors.pop(0)
         v_errors.pop(0)
 
-        average = average + v_errors[len(v_errors) - 1]
-        final_errors.append(v_errors[len(v_errors) - 1])
+        average = average + min(v_errors)
+        final_errors.append(min(v_errors))
 
         final_weights = my_nn.get_all_weights()
 

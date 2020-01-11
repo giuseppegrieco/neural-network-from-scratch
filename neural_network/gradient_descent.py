@@ -50,6 +50,11 @@ def gradient_descent(
     except ValueError:
         raise ValueError('alpha_momentum parameter must be a float')
 
+    for layer in neural_network.get_topology():
+        layer.set_weights(
+            layer.get_weights() + (alpha_momentum * layer.get_delta_old())
+        )
+
     output = neural_network.feed_forward(input_data)
 
     input_data = convert_in_numpy(input_data)
@@ -69,7 +74,7 @@ def gradient_descent(
         lambda_regularization,
         alpha_momentum
     )
-    return np.matrix.sum(np.power(expected_output - output, 2)) * (1 / len(expected_output.T))
+    return np.matrix.mean(np.power(expected_output - output, 2))
 
 
 def __back_propagation(
