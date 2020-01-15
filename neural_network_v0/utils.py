@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import os
 import csv
 import json
-import neural_network as nn
+import neural_network_v0 as nn
 import datetime
 import random
 
@@ -228,7 +228,7 @@ def read_input(data):
     a_eta = data["learning_rate"]
     a_lambda_reg = data["lambda_regularization"]
     a_alpha_momentum = data["alpha_momentum"]
-    from neural_network import gradient_descent
+    from neural_network_v0 import gradient_descent
     learning_algorithm = gradient_descent  # TODO: check
     topologies = data["topology"]
     a_topology = get_topology_from_json(topologies)

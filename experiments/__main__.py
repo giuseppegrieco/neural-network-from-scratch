@@ -1,9 +1,42 @@
-import neural_network as nn
-import neural_network.utils as utils
+import neural_network_v0 as nn
+import neural_network_v0.utils as utils
 import sys
 import json
 import numpy as np
 
+from neural_network import NeuralNetwork
+from neural_network.learning_algorithm.cascade_correlation import CC
+from neural_network.loss import MSE
+
+TS = np.genfromtxt('cup/tr.csv', delimiter=',')
+
+TS = TS[:, 1:]
+
+X_train = TS[:1000, :-2]
+Y_train = TS[:1000, -2:]
+
+X_val = TS[1000:, :-2]
+Y_val = TS[1000:, -2:]
+n, m = X_val.T.shape
+bias = np.ones((1, m), dtype=np.dtype('d'))
+X_val = np.vstack((X_val.T, bias))
+
+print(X_val.shape)
+
+mynn = NeuralNetwork(20)
+CC(
+    mynn,
+    (X_train.T, Y_train.T),
+    None,
+    50,
+    0.01,
+    0.8,
+    0.001
+)
+#value = mynn.feed_forward(X_val.T)
+#print(MSE().evaluate(value, Y_val.T))
+
+sys.exit()
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         raise Exception("Input Error")

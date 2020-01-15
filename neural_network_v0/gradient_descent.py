@@ -19,7 +19,7 @@ def gradient_descent(
     in according to the hyperparameters specified.
 
     Params:
-        neural_network: network where apply the algorithm
+        neural_network_v0: network where apply the algorithm
         input_data: input data in matrix form
         expected_output: expected output of input data, indicated in matrix form
         learning_rate: coefficient to control the weights change w.r.t error each epoch

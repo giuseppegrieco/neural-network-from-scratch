@@ -6,8 +6,8 @@
 from concurrent.futures import ProcessPoolExecutor
 from tornado import concurrent
 
-import neural_network as nn
-import neural_network.utils as utils
+import neural_network_v0 as nn
+import neural_network_v0.utils as utils
 import numpy as np
 import sys
 import datetime
