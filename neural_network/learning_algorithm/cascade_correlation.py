@@ -40,7 +40,7 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
         output_layer = neural_network.layers[-1]
         self.__update_output_layer(output_layer, Y_train, current_input)
         self.__last_output = output_layer.computes(current_input)
-        while number_of_nodes < self.__max_nodes:
+        while number_of_nodes < self.__max_nodes and not self._stopped:
             correlation = sys.float_info.min
             hidden_layer = None
             for i in range(0, self.__pool_size):
