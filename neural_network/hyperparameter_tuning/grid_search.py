@@ -15,7 +15,7 @@ class GridSearch(object):
         with ProcessPoolExecutor(max_workers=number_of_process) as executor:
             futures = []
             for hyperparameters in self.__grid_search_specification.combinations_of_hyperparameters():
-                futures.append((executor.submit(
+                futures.append([executor.submit(
                     self.__cross_validation.estimates,
                     self.__grid_search_specification.build_neural_network_object(
                         hyperparameters
@@ -25,7 +25,7 @@ class GridSearch(object):
                     ),
                     X_train,
                     Y_train
-                ), hyperparameters))
+                ), hyperparameters])
 
             results = []
             for future in futures:
