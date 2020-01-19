@@ -1,7 +1,6 @@
 import sys
 
 from neural_network import learning_algorithm as learning_algorithm
-from neural_network.learning_observer import ErrorObserver
 from neural_network.early_stopping.early_stopping import EarlyStopping
 
 

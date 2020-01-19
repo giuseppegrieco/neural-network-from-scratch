@@ -21,5 +21,8 @@ class EarlyStoppingMinimalIncrease(EarlyStopping):
             new_error = self._error_observer.store[-1]
             if self.__last_error - new_error < self.__last_error * self.__minimal_increase:
                 self.__fail_counter += 1
+            else:
+                self.__fail_counter = 0
             if self.__fail_counter == self.__max_fails:
                 learning_algorithm.stopped = True
+            self.__last_error = new_error
