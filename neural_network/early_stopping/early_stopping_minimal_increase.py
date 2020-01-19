@@ -17,8 +17,9 @@ class EarlyStoppingMinimalIncrease(EarlyStopping):
         self.__max_fails = max_fails
 
     def update(self, learning_algorithm: learning_algorithm.LearningAlgorithm) -> None:
-        new_error = self._error_observer.store[-1]
-        if self.__last_error - new_error < self.__last_error * self.__minimal_increase:
-            self.__fail_counter += 1
-        if self.__fail_counter == self.__max_fails:
-            learning_algorithm.stopped = True
+        if len(self._error_observer.store) > 0:
+            new_error = self._error_observer.store[-1]
+            if self.__last_error - new_error < self.__last_error * self.__minimal_increase:
+                self.__fail_counter += 1
+            if self.__fail_counter == self.__max_fails:
+                learning_algorithm.stopped = True

@@ -1,4 +1,5 @@
 from concurrent.futures.process import ProcessPoolExecutor
+from concurrent.futures.thread import ThreadPoolExecutor
 
 import numpy as np
 
@@ -12,7 +13,7 @@ class GridSearch(object):
         self.__cross_validation = cross_validation
 
     def run(self, number_of_process: int, X_train: np.mat, Y_train: np.mat):
-        with ProcessPoolExecutor(max_workers=number_of_process) as executor:
+        with ThreadPoolExecutor(max_workers=number_of_process) as executor:
             futures = []
             for hyperparameters in self.__grid_search_specification.combinations_of_hyperparameters():
                 futures.append((executor.submit(
