@@ -1,214 +1,154 @@
-from neural_network.activation_function import Sigmoid, Identity
-from neural_network.layer import Layer
-
-import numpy as np
 import sys
 
-from neural_network.loss import MSE
+import numpy as np
+
+import neural_network.learning_algorithm as learning_algorithm
+
+from neural_network.functions import MeanSquaredError
+from neural_network.layers import Layer, WeightsInitializer
+from neural_network.neural_network_cc import NeuralNetworkCC
 
 
-def CC(
-        neural_network,
-        training_data,
-        activation_function,
-        epochs,
-        learning_rate,
-        momentum,
-        regularization
-):
-    tr_input, tr_output = training_data
+class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
+    def __init__(
+            self,
+            learning_rate: float,
+            momentum: float,
+            regularization_correlation: float,
+            regularization_pseudo_inverse: float,
+            activation_function,
+            weights_initializer: WeightsInitializer,
+            epochs: int,
+            max_nodes
+    ):
+        self.__learning_rate = learning_rate
+        self.__momentum = momentum
+        self.__regularization_correlation = regularization_correlation
+        self.__regularization_pseudo_inverse = regularization_pseudo_inverse
+        self.__activation_function = activation_function
+        self.__weights_initializer = weights_initializer
+        self.__epochs = epochs
+        self.__last_output = None
+        self.__max_nodes = max_nodes
 
-    n, m = tr_input.shape
-    bias = np.ones((1, m), dtype=np.dtype('d'))
-    tr_input = np.vstack((tr_input, bias))
-
-    output_layer = CCOutputLayer(tr_input, tr_output, regularization, Identity())
-    neural_network.set_output_layer(output_layer)
-
-    previous_error = sys.float_info.min
-    current_epoch = 0
-    last_output = tr_input
-
-    # TODO WE HAVE ALREADY COMPUTED
-    new_error = MSE().evaluate(output_layer.get_previous_output(), tr_output)
-
-    print("Initial error : % 5.10f" %(new_error))
-    i = 0
-    while current_epoch < epochs + 1:
-        print("------------------- Node : % 2d ------------------- " %(current_epoch + 1))
-        previous_error = new_error
-
-        hidden_layer = CCHiddenLayer(
-            Sigmoid(),
-            last_output
+    def train(self, neural_network: NeuralNetworkCC, X_train: np.mat, Y_train: np.mat):
+        X_train = Layer.add_bias_input(X_train)
+        number_of_nodes = 0
+        current_input = X_train
+        output_layer = neural_network.layers[-1]
+        self.__update_output_layer(output_layer, Y_train, current_input)
+        self.__last_output = output_layer.computes(current_input)
+        new_error = MeanSquaredError.evaluate(
+            self.__last_output - Y_train
         )
 
-        last_predicted_value = output_layer.get_previous_output()
-
-        E = np.power(tr_output - last_predicted_value, 2)
-        E_mean = np.sum(E, axis=1) * 1 / len(tr_input.T)
-        E_mean = np.reshape(E_mean, (len(tr_output), 1))
-        i += 1
-        E_tot = E - E_mean
-
-        new_correlation, V_tot = __calculates_correlation(
-            hidden_layer,
-            E_tot
-        )
-        correlation = sys.float_info.min
-        delta_old = np.zeros(hidden_layer.get_weights().shape)
-        i = 10
-        while i > 0:
-            if new_correlation - correlation < correlation * 0.001:
-                i = i - 1
-            else:
-                i = 20
-            correlation = new_correlation
-
-            delta = np.sign(
-                __calculates_output_correlation(V_tot, E_tot)
+        print('initial error')
+        print(new_error)
+        while number_of_nodes < self.__max_nodes:
+            print('iteration n.')
+            print(number_of_nodes)
+            hidden_layer = Layer(
+                1,
+                self.__activation_function,
+                self.__weights_initializer
             )
-            delta = np.reshape(delta, (len(tr_output), 1))
-            delta = np.multiply(delta, E - E_mean)
-            delta = np.multiply(delta, hidden_layer.get_activation_function().d(
-                hidden_layer.get_weights().T.dot(hidden_layer.get_previous_output())
-            ))
-            delta = np.sum(np.dot(delta, hidden_layer.get_previous_output().T).T, axis=1)
-            delta = np.reshape(delta, (len(last_output), 1))
-
-            hidden_layer.set_weights(
-                hidden_layer.get_weights() +
-                (learning_rate * delta) +
-                (momentum * delta_old) +
-                (regularization * -hidden_layer.get_weights())
-            )
-            delta_old = delta
-            new_correlation, V_tot = __calculates_correlation(
+            self.__weights_initializer.initializes(
                 hidden_layer,
+                (1, len(current_input))
+            )
+
+            E = Y_train - self.__last_output
+            E_mean = np.sum(E, axis=1) * 1 / len(X_train.T)
+            E_mean = np.reshape(E_mean, (len(Y_train), 1))
+            E_tot = E - E_mean
+
+            new_correlation, V_tot = self.__calculates_correlation(
+                hidden_layer.computes(current_input),
                 E_tot
             )
-            print(new_correlation)
+            correlation = sys.float_info.min
+            delta_old = np.zeros(hidden_layer.weights.shape)
+            i = 10
+            current_epoch = 0
+            while i > 0 and current_epoch < self.__epochs:
+                if new_correlation - correlation < correlation * 0.000001:
+                    i = i - 1
+                else:
+                    i = 20
+                correlation = new_correlation
 
+                delta = np.sign(
+                    self.__calculates_output_correlation(V_tot, E_tot)
+                )
+                delta = np.reshape(delta, (len(Y_train), 1))
+                delta = np.multiply(delta, E - E_mean)
+                delta = np.multiply(delta, hidden_layer.activation_function.derivative(
+                    hidden_layer.net
+                ))
+                delta = np.sum(np.dot(delta, hidden_layer.last_input.T).T, axis=1)
+                delta = np.reshape(delta, (1, len(current_input)))
 
-        output_layer.add_weights(
-            hidden_layer.computes_optimized_for_training(),
-            tr_output
-        )
-        neural_network.add_hidden_layer(
-            hidden_layer
-        )
+                hidden_layer.weights = (
+                    hidden_layer.weights +
+                    (self.__learning_rate * delta) +
+                    (self.__momentum * delta_old) +
+                    (-self.__regularization_correlation * hidden_layer.weights)
+                )
+                delta_old = delta
+                new_correlation, V_tot = self.__calculates_correlation(
+                    hidden_layer.computes(current_input),
+                    E_tot
+                )
+                current_epoch += 1
 
-        new_error = MSE().evaluate(
-            output_layer.get_previous_output(),
-            tr_output
-        )
-        print("------------------- MSE : % 5.10f ------------------- " %(new_error))
-        last_output = np.vstack((
-            last_output,
-            hidden_layer.computes_optimized_for_training()
-        ))
-        current_epoch += 1
-        print("----------------------------------------------------- " %(new_error))
-
-
-def __calculates_correlation(hidden_layer, E_tot):
-    V = hidden_layer.computes_optimized_for_training()
-    print('dio')
-    print(V.shape)
-    V_mean = np.mean(V)
-    V_tot = V - V_mean
-
-    return np.sum(
-        np.absolute(__calculates_output_correlation(V_tot, E_tot)),
-        axis=0
-    ), V_tot
-
-
-def __calculates_output_correlation(V_tot, E_tot):
-    return np.sum(
-        np.multiply(V_tot, E_tot),
-        axis=1
-    )
-
-
-def __calculate_error():
-    pass
-
-
-class CCHiddenLayer(Layer):
-    def __init__(self, activation_function, previous_output):
-        self.__activation_function = activation_function
-        self.__previous_output = previous_output
-
-        self.__weights = np.random.normal(
-            0, 1 / np.sqrt(len(self.__previous_output)),
-            (len(self.__previous_output), 1)
-        )
-
-    def get_weights(self):
-        return self.__weights
-
-    def set_weights(self, weights):
-        self.__weights = weights
-
-    def get_activation_function(self):
-        return self.__activation_function
-
-    def computes_optimized_for_training(self):
-        return self.computes(self.__previous_output)
-
-    def get_previous_output(self):
-        return self.__previous_output
-
-    def computes(self, input_data):
-        return self.__activation_function.f(
-            self.__weights.T.dot(input_data)
-        )
-
-
-class CCOutputLayer(Layer):
-    def __init__(self, input_data, expected_output, regularization, activation_function):
-        self.__weights = None
-        self.__last_output = 0
-        self.__regularization = regularization
-        self.__activation_function = activation_function
-
-        self.add_weights(input_data, expected_output)
-
-    def add_weights(self, input_data, expected_output):
-        psuedo = self.__pseudo_inverse(input_data).T
-        new_weights = np.dot(
-            (expected_output - self.__last_output),
-            psuedo
-        )
-        print('new:')
-        print(new_weights)
-        self.__last_output = self.__last_output + new_weights.dot(
-            input_data
-        )
-        if self.__weights is None:
-            self.__weights = new_weights
-        else:
-            self.__weights = np.hstack((
-                self.__weights,
-                new_weights
+            current_input = np.vstack((
+                current_input,
+                hidden_layer.computes(current_input)
             ))
+            self.__update_output_layer(output_layer, Y_train, current_input)
+            #TODO AGGIUNGI NODO
+            neural_network.layers.pop(-1)
+            neural_network.layers.append(hidden_layer)
+            neural_network.layers.append(output_layer)
+            new_error = MeanSquaredError.evaluate(
+                self.__last_output - Y_train
+            )
+            print(new_error)
+            number_of_nodes += 1
+            self._notify()
 
-    def get_activation_function(self):
-        return self.__activation_function
+    @staticmethod
+    def __calculates_output_correlation(V_tot, E_tot):
+        return np.sum(
+            np.multiply(V_tot, E_tot),
+            axis=1
+        )
 
-    def __pseudo_inverse(self, input_data):
+    def __calculates_correlation(self, hidden_layer_output, E_tot):
+        V = hidden_layer_output
+        V_mean = np.mean(V)
+        V_tot = V - V_mean
+
+        return np.sum(
+            np.absolute(self.__calculates_output_correlation(V_tot, E_tot)),
+            axis=0
+        ), V_tot
+
+    def __update_output_layer(self, output_layer: Layer, Y_train: np.mat, new_input):
+        pseudo_inverse = self.__pseudo_inverse(new_input).T
+        new_weights = np.dot(
+            Y_train,
+            pseudo_inverse
+        )
+        self.__last_output = new_weights.dot(
+            new_input
+        )
+        output_layer.weights = new_weights
+
+    def __pseudo_inverse(self, Y_train):
         return np.dot(np.linalg.inv(
             np.dot(
-                input_data,
-                input_data.T
-            ) + (np.identity(len(input_data)) * -self.__regularization)
-        ), input_data)
-
-    def get_previous_output(self):
-        return self.__last_output
-
-    def computes(self, input_data):
-        return self.__activation_function.f(
-            self.__weights.T.dot(input_data)
-        )
+                Y_train,
+                Y_train.T
+            ) + (np.identity(len(Y_train)) * -self.__regularization_pseudo_inverse)
+        ), Y_train)

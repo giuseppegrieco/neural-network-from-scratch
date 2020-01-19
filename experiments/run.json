@@ -5,24 +5,20 @@
   "training_file": "cup/tr.csv",
   "validation_file": "monks-3.test",
   "learning_rate": [
-      0.0001
+     6e-05
   ],
   "lambda_regularization": [
-    0.000007
+    0.0001
   ],
   "alpha_momentum": [
-      0.8
+0.7
   ],
   "learning_algorithm": "gradient_descent",
   "topology":
     [
       [
         {
-        "nodes": 200,
-        "activation_function": "Sigmoid"
-        },
-        {
-        "nodes": 400,
+        "nodes": 175,
         "activation_function": "Sigmoid"
         },
         {
