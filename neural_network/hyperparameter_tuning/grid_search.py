@@ -13,7 +13,7 @@ class GridSearch(object):
         self.__cross_validation = cross_validation
 
     def run(self, number_of_process: int, X_train: np.mat, Y_train: np.mat):
-        with ThreadPoolExecutor(max_workers=number_of_process) as executor:
+        with ProcessPoolExecutor(max_workers=number_of_process) as executor:
             futures = []
             for hyperparameters in self.__grid_search_specification.combinations_of_hyperparameters():
                 futures.append((executor.submit(
@@ -27,7 +27,6 @@ class GridSearch(object):
                     X_train,
                     Y_train
                 ), hyperparameters))
-
             results = []
             for future in futures:
                 results.append({

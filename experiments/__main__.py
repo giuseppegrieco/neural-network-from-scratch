@@ -148,7 +148,7 @@ if __name__ == '__main__':
         ],
         learning_rate_list=[0.00006],
         momentum_list=[0.6],
-        epochs_list=[5],
+        epochs_list=[100],
         regularization_list=[0.000007]
     )
 
