@@ -1,17 +1,48 @@
+import datetime
+import json
+import os
 import sys
 import numpy as np
 
-from neural_network import NeuralNetwork
+from neural_network.early_stopping import EarlyStoppingMinimalIncrease
 from neural_network.functions import Sigmoid, Identity, MeanSquaredError
-from neural_network.hyperparameter_tuning import GradientDescentTuningSpecs, GridSearch
+from neural_network.hyperparameter_tuning import GridSearch, CascadeCorrelationTuningSpecs, GradientDescentTuningSpecs
 from neural_network.layers import Layer, RandomNormalInitializer
-from neural_network.learning_algorithm import GradientDescent, CascadeCorrelation
+from neural_network.learning_algorithm import CascadeCorrelation
 from neural_network.learning_observer import ErrorObserver
 from neural_network.model_selection import KFoldCrossValidation
 
 import matplotlib.pyplot as plt
 
 from neural_network.neural_network_cc import NeuralNetworkCC
+
+
+def create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec, topology, path, average, variance):
+    data = \
+        {
+            'learning_algorithm':
+                {  # TODO: fix it when the learning algorithm will be a parameter
+                    'name': 'gradient_descent',
+                    'learning_rate': eta,
+                    'lambda_regularization': lambda_reg,
+                    'alpha_momentum': alpha_momentum
+                },
+            'topology': {},
+            'epochs': epochs,
+            'duration_sec': duration_in_sec,
+            'average': average,
+            'variance': variance
+        }
+
+    index = 0
+    for layer in topology:
+        activation_function_name = layer.get_activation_function()
+        activation_function_name = activation_function_name.__class__.__name__
+        data['topology'][str(index)] = {'nodes': layer.get_nodes(), 'activation_function': activation_function_name}
+        index = index + 1
+
+    with open(path + 'data.json', 'w') as fp:
+        json.dump(data, fp)
 
 
 def plotgraph(training_errors, validation_errors):
@@ -45,12 +76,13 @@ def cascade():
     cc = CascadeCorrelation(
         learning_rate=0.4,
         momentum=0.6,
-        regularization_correlation=0.0001,
-        regularization_pseudo_inverse=0.0001,
+        regularization_correlation=0.01,
+        regularization_pseudo_inverse=0.0006,
         activation_function=Sigmoid,
         weights_initializer=w_init,
-        epochs=30000,
-        max_nodes=100
+        epochs=100,
+        max_nodes=100,
+        pool_size=10
     )
     e1 = ErrorObserver(neural_network=my_nn, X=X_train, Y=Y_train, error_function=MeanSquaredError)
     e2 = ErrorObserver(neural_network=my_nn, X=X_val, Y=Y_val, error_function=MeanSquaredError)
@@ -62,35 +94,64 @@ def cascade():
     sys.exit(0)
 
 
-def print_mean(mean, variance):
-    print('mean')
-    print(mean)
-    print('variance')
-    print(variance)
+def create_timestamp_directory(path, prefix=''):  # todo: mettere secondo camnpo non obbligatiorio
+    directory_name = path + prefix + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+    try:
+        os.mkdir(directory_name)
+    except FileExistsError as e:
+        raise e
+    return directory_name
+
+
+def save(grid_result, grid_search_duration_in_sec, k):
+    initial_path = create_timestamp_directory("./grid_search/", "GS-")
+    data = {'duration_GS': grid_search_duration_in_sec}
+    with open(initial_path + '/data.json', 'w') as fp:
+        json.dump(data, fp)
+
+    for result in grid_result:
+        directory_name = create_timestamp_directory(initial_path + '/', "")
+
+        with open(directory_name + '/hyperparameters.json', 'w') as fp:
+            json.dump(result['hyperparameters'], fp)
+        with open(directory_name + '/result.json', 'w') as fp:
+            json.dump({
+                'mean': result['result']['mean'],
+                'variance': result['result']['variance']
+            }, fp)
+        for i in range(1, k + 1):
+            fold_directory_name = directory_name + "/fold-" + str(i)
+            try:
+                os.mkdir(fold_directory_name)
+            except FileExistsError as e:
+                raise e
+            fold = result['result'][str(i)]
+            np.save(fold_directory_name + "/initial_weights", fold['initial_weights'])
+            np.save(fold_directory_name + "/training_errors", fold['training_errors'])
+            print(min(fold['validation_errors']))
+            print(fold['validation_errors'])
+            np.save(fold_directory_name + "/validation_errors", fold['validation_errors'])
+            with open(fold_directory_name + '/result.json', 'w') as fp:
+                json.dump({'validation_score': fold['validation_score']}, fp)
 
 
 if __name__ == '__main__':
-    cascade()
+    start_time_GS = datetime.datetime.now().timestamp()
+
     w_init = RandomNormalInitializer()
 
     gds = GradientDescentTuningSpecs(
         input_size=20,
         layers_list=[
             [
-                Layer(225, Sigmoid, w_init),
+                Layer(175, Sigmoid, w_init),
                 Layer(2, Identity, w_init)
             ]
         ],
-        learning_rate_list=[
-            6e-05
-        ],
-        momentum_list=[
-            0.6
-        ],
-        regularization_list=[
-            4e-05
-        ],
-        epochs=15000
+        learning_rate_list=[0.00006],
+        momentum_list=[0.6],
+        epochs_list=[1500],
+        regularization_list=[0.000007]
     )
 
     TS = np.genfromtxt('cup/tr.csv', delimiter=',')
@@ -100,10 +161,17 @@ if __name__ == '__main__':
     Y_train = TS[:, -2:].T
 
     cross_validation = KFoldCrossValidation(5, MeanSquaredError)
-    cross_validation.on_finish = print_mean
+    cross_validation.add_early_stopping(
+        EarlyStoppingMinimalIncrease(0.0001, 100)
+    )
 
     gs = GridSearch(gds, cross_validation)
 
-    grid_result = gs.run(2, X_train, Y_train)
+    grid_result = gs.run(1, X_train, Y_train)
+
+    end_time_GS = datetime.datetime.now().timestamp()
+    grid_search_duration_in_sec = end_time_GS - start_time_GS
+
+    save(grid_result, grid_search_duration_in_sec, 5)
 
     sys.exit(0)
