@@ -11,6 +11,7 @@ class ConjugateGradientDescent(GradientDescent):
             epochs: int,
             beta_formula
     ):
+        super().__init__()
         super().__init__(learning_rate, 0, regularization, epochs)
         self.__beta_formula = beta_formula
 

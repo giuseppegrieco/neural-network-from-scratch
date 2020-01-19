@@ -23,3 +23,7 @@ class EarlyStoppingValidationScore(EarlyStopping):
             self.__fail_counter += 1
             if self.__fail_counter == self.__max_fails:
                 learning_algorithm.stopped = True
+
+    def reset(self):
+        self.__fail_counter = 0
+        self.__minimum = sys.float_info.max

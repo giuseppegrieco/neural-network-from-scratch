@@ -14,6 +14,7 @@ class GradientDescent(learning_algorithm.LearningAlgorithm):
             regularization: float,
             epochs: int
     ):
+        super().__init__()
         self._learning_rate = learning_rate
         self._momentum = momentum
         self._regularization = regularization

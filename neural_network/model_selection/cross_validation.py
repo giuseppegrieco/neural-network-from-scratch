@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -10,7 +12,8 @@ from neural_network.learning_observer import ErrorObserver
 
 
 class CrossValidation(ABC):
-    _early_stopping_list: List[EarlyStopping] = []
+    def __init__(self):
+        self._early_stopping_list = []
 
     @abstractmethod
     def estimates(
@@ -23,6 +26,7 @@ class CrossValidation(ABC):
 
     def _attach_early_stopping(self, validation_observer: ErrorObserver, learning_algorithm: LearningAlgorithm):
         for early_stopping in self._early_stopping_list:
+            early_stopping.reset()
             early_stopping.error_observer = validation_observer
             learning_algorithm.attach(early_stopping)
 

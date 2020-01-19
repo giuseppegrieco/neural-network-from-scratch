@@ -10,6 +10,7 @@ from neural_network.model_selection import CrossValidation
 
 class KFoldCrossValidation(CrossValidation):
     def __init__(self, k, error_function):
+        super().__init__()
         self.__k = k
         self.__error_function = error_function
 
@@ -35,7 +36,7 @@ class KFoldCrossValidation(CrossValidation):
             learning_algorithm.attach(
                 training_observer
             )
-            self._attach_early_stopping(validation_observer, learning_algorithm)
+            super()._attach_early_stopping(validation_observer, learning_algorithm)
             learning_algorithm.train(
                 neural_network,
                 fold[0][0],

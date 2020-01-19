@@ -22,6 +22,7 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
             max_nodes: int,
             pool_size: int
     ):
+        super().__init__()
         self.__learning_rate = learning_rate
         self.__momentum = momentum
         self.__regularization_correlation = regularization_correlation

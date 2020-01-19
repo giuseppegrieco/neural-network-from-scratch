@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from neural_network.learning_observer import ErrorObserver, LearningObserver
 
@@ -16,3 +16,7 @@ class EarlyStopping(LearningObserver, ABC):
     @error_observer.setter
     def error_observer(self, error_observer: ErrorObserver):
         self._error_observer = error_observer
+
+    @abstractmethod
+    def reset(self):
+        pass
