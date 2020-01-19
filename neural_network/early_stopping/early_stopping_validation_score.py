@@ -15,14 +15,15 @@ class EarlyStoppingValidationScore(EarlyStopping):
         self.__minimum = sys.float_info.max
 
     def update(self, learning_algorithm: learning_algorithm.LearningAlgorithm) -> None:
-        new_error = self._error_observer.store[-1]
-        if new_error < self.__minimum:
-            self.__minimum = new_error
-            self.__fail_counter = 0
-        else:
-            self.__fail_counter += 1
-            if self.__fail_counter == self.__max_fails:
-                learning_algorithm.stopped = True
+        if len(self._error_observer.store) > 0:
+            new_error = self._error_observer.store[-1]
+            if new_error < self.__minimum:
+                self.__minimum = new_error
+                self.__fail_counter = 0
+            else:
+                self.__fail_counter += 1
+                if self.__fail_counter == self.__max_fails:
+                    learning_algorithm.stopped = True
 
     def reset(self):
         self.__fail_counter = 0

@@ -4,7 +4,7 @@ import os
 import sys
 import numpy as np
 
-from neural_network.early_stopping import EarlyStoppingMinimalIncrease
+from neural_network.early_stopping import EarlyStoppingMinimalIncrease, EarlyStoppingValidationScore
 from neural_network.functions import Sigmoid, Identity, MeanSquaredError
 from neural_network.hyperparameter_tuning import GridSearch, CascadeCorrelationTuningSpecs, GradientDescentTuningSpecs
 from neural_network.layers import Layer, RandomNormalInitializer
@@ -142,14 +142,14 @@ if __name__ == '__main__':
         input_size=20,
         layers_list=[
             [
-                Layer(175, Sigmoid, w_init),
+                Layer(70, Sigmoid, w_init),
                 Layer(2, Identity, w_init)
             ]
         ],
-        learning_rate_list=[0.00006],
-        momentum_list=[0.6],
-        epochs_list=[100],
-        regularization_list=[0.000007]
+        learning_rate_list=[0.00007],
+        momentum_list=[0.7],
+        epochs_list=[15000],
+        regularization_list=[0.00007]
     )
 
     TS = np.genfromtxt('cup/tr.csv', delimiter=',')
@@ -160,7 +160,10 @@ if __name__ == '__main__':
 
     cross_validation = KFoldCrossValidation(5, MeanSquaredError)
     cross_validation.add_early_stopping(
-        EarlyStoppingMinimalIncrease(0.0001, 100)
+        EarlyStoppingMinimalIncrease(0.00001, 100)
+    )
+    cross_validation.add_early_stopping(
+        EarlyStoppingValidationScore(100)
     )
 
     gs = GridSearch(gds, cross_validation)
