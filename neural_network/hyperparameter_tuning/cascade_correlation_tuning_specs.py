@@ -81,5 +81,5 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
             "momentum": hyperparameters[6],
             "regularization_correlation": hyperparameters[7],
             "regularization_pseudo_inverse": hyperparameters[8],
-            "output_layer": hyperparameters[9]
+            "output_layer": hyperparameters[9].__repr__()
         }

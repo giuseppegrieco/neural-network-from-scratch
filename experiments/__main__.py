@@ -128,8 +128,6 @@ def save(grid_result, grid_search_duration_in_sec, k):
             fold = result['result'][str(i)]
             np.save(fold_directory_name + "/initial_weights", fold['initial_weights'])
             np.save(fold_directory_name + "/training_errors", fold['training_errors'])
-            print(min(fold['validation_errors']))
-            print(fold['validation_errors'])
             np.save(fold_directory_name + "/validation_errors", fold['validation_errors'])
             with open(fold_directory_name + '/result.json', 'w') as fp:
                 json.dump({'validation_score': fold['validation_score']}, fp)
@@ -150,7 +148,7 @@ if __name__ == '__main__':
         ],
         learning_rate_list=[0.00006],
         momentum_list=[0.6],
-        epochs_list=[1500],
+        epochs_list=[5],
         regularization_list=[0.000007]
     )
 

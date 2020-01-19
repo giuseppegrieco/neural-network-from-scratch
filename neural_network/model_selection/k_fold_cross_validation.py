@@ -41,25 +41,20 @@ class KFoldCrossValidation(CrossValidation):
                 fold[0][0],
                 fold[0][1]
             )
-            neural_network.pack()
-
             error = min(validation_observer.store)
             errors.append(error)
             mean = mean + error
 
             folds.update({
                 str(fold_counter): {
-                    "X_train": fold[0][0],
-                    "Y_train": fold[0][1],
-                    "X_val": fold[1][0],
-                    "Y_val": fold[1][1],
-                    "initial_weights": initial_weights,
-                    "training_errors": training_observer.store,
-                    "validation_errors": validation_observer.store,
+                    "initial_weights": initial_weights.copy(),
+                    "training_errors": training_observer.store.copy(),
+                    "validation_errors": validation_observer.store.copy(),
                     "validation_score": error
                 }
             })
             fold_counter += 1
+            neural_network.pack()
 
         mean = mean / len(errors)
         for error in errors:

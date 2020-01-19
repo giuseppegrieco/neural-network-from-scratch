@@ -50,7 +50,7 @@ class GradientDescentTuningSpecs(TuningSpecs):
     def combinations_repr(self, hyperparameters: List):
         return {
             "epochs": hyperparameters[0],
-            "layers": hyperparameters[1],
+            "layers": [layer.__repr__() for layer in hyperparameters[1]],
             "learning_rate": hyperparameters[2],
             "momentum": hyperparameters[3],
             "regularization": hyperparameters[4]
