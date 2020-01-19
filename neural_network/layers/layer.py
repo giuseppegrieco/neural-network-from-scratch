@@ -90,3 +90,7 @@ class Layer(object):
     @is_hidden.setter
     def is_hidden(self, is_hidden: bool):
         self.__is_hidden = is_hidden
+
+    def __repr__(self):
+        return "number_of_nodes=%d, activation_function=%s" % \
+               (self.__number_of_nodes, str(self.__activation_function.__name__))

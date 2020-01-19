@@ -1,9 +1,11 @@
 from .grid_search import GridSearch
 from .tuning_specs import TuningSpecs
-from neural_network.hyperparameter_tuning.gradient_descent_tuning_specs import GradientDescentTuningSpecs
+from .gradient_descent_tuning_specs import GradientDescentTuningSpecs
+from .cascade_correlation_tuning_specs import CascadeCorrelationTuningSpecs
 
 __all__ = [
     'GridSearch',
     'TuningSpecs',
-    'GradientDescentTuningSpecs'
+    'GradientDescentTuningSpecs',
+    'CascadeCorrelationTuningSpecs'
 ]

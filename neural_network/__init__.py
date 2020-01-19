@@ -2,6 +2,7 @@ import itertools
 
 from neural_network.neural_network import NeuralNetwork
 
+import neural_network.early_stopping as early_stopping
 import neural_network.functions as functions
 import neural_network.hyperparameter_tuning as hyperparameter_tuning
 import neural_network.layers as layers
@@ -11,6 +12,7 @@ import neural_network.model_selection as model_selection
 
 __all__ = [x for x in itertools.chain(
     ['NeuralNetwork', 'NeuralNetworkCC'],
+    early_stopping.__all__,
     functions.__all__,
     hyperparameter_tuning.__all__,
     layers.__all__,

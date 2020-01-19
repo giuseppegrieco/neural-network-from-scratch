@@ -8,10 +8,9 @@ from neural_network.early_stopping.early_stopping import EarlyStopping
 class EarlyStoppingValidationScore(EarlyStopping):
     def __init__(
             self,
-            error_observer: ErrorObserver,
             max_fails: int
     ):
-        super().__init__(error_observer)
+        super().__init__()
         self.__max_fails = max_fails
         self.__fail_counter = 0
         self.__minimum = sys.float_info.max

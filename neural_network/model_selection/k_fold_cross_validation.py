@@ -10,7 +10,6 @@ from neural_network.model_selection import CrossValidation
 
 class KFoldCrossValidation(CrossValidation):
     def __init__(self, k, error_function):
-        super().__init__()
         self.__k = k
         self.__error_function = error_function
 
@@ -24,28 +23,54 @@ class KFoldCrossValidation(CrossValidation):
         mean = 0
         variance = 0
         errors = []
+        folds = {}
+        fold_counter = 1
         for fold in self.__k_folds(X_train, Y_train):
+            initial_weights = [layer.weights.copy() for layer in neural_network.layers]
             validation_observer = ErrorObserver(neural_network, fold[1][0], fold[1][1], self.__error_function)
+            training_observer = ErrorObserver(neural_network, fold[0][0], fold[0][1], self.__error_function)
             learning_algorithm.attach(
                 validation_observer
             )
-            self._on_fold_attempt_start(validation_observer, learning_algorithm)
+            learning_algorithm.attach(
+                training_observer
+            )
+            self._attach_early_stopping(validation_observer, learning_algorithm)
             learning_algorithm.train(
                 neural_network,
                 fold[0][0],
                 fold[0][1]
             )
             neural_network.pack()
-            self._on_fold_attempt_end(validation_observer, learning_algorithm)
 
             error = min(validation_observer.store)
             errors.append(error)
             mean = mean + error
+
+            folds.update({
+                str(fold_counter): {
+                    "X_train": fold[0][0],
+                    "Y_train": fold[0][1],
+                    "X_val": fold[1][0],
+                    "Y_val": fold[1][1],
+                    "initial_weights": initial_weights,
+                    "training_errors": training_observer.store,
+                    "validation_errors": validation_observer.store,
+                    "validation_score": error
+                }
+            })
+            fold_counter += 1
+
         mean = mean / len(errors)
         for error in errors:
             variance = variance + np.square(error - mean)
         variance = variance / len(errors)
-        self._on_finish(mean, variance)
+
+        folds.update({
+            "mean": mean,
+            "variance": variance
+        })
+        return folds
 
     def __k_folds(self, X_train: np.mat, Y_train: np.mat) -> List:
         random_indexes = np.arange(len(X_train.T))

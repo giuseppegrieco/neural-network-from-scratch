@@ -14,15 +14,15 @@ class GradientDescent(learning_algorithm.LearningAlgorithm):
             regularization: float,
             epochs: int
     ):
-        self.__learning_rate = learning_rate
-        self.__momentum = momentum
-        self.__regularization = regularization
-        self.__epochs = epochs
+        self._learning_rate = learning_rate
+        self._momentum = momentum
+        self._regularization = regularization
+        self._epochs = epochs
 
     def train(self, neural_network: neural_network.NeuralNetwork, X_train: np.mat, Y_train: np.mat):
         momentum_memory = [0] * len(neural_network.layers)
         i = 0
-        while i < self.__epochs and not self._stopped:
+        while i < self._epochs and not self._stopped:
             predicted_Y = neural_network.feed_forward(X_train)
 
             gradients = self.__back_propagation(neural_network, Y_train, predicted_Y)
@@ -54,12 +54,12 @@ class GradientDescent(learning_algorithm.LearningAlgorithm):
     def update_weights(self, layer, gradient: np.mat, momentum_stored):
         layer_weights = layer.weights
 
-        lambda_mat = np.full(layer_weights.shape, -self.__regularization)
+        lambda_mat = np.full(layer_weights.shape, -self._regularization)
         if layer.is_hidden:
             lambda_mat[:, 0] = 0.0
         regularization = np.multiply(lambda_mat, layer_weights)
 
-        adding_factor = (-self.__learning_rate * gradient) + (self.__momentum * momentum_stored) + regularization
+        adding_factor = (-self._learning_rate * gradient) + (self._momentum * momentum_stored) + regularization
 
         layer.weights = layer_weights + adding_factor
 

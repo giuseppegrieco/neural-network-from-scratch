@@ -1,18 +1,16 @@
 import sys
 
 from neural_network import learning_algorithm as learning_algorithm
-from neural_network.learning_observer import ErrorObserver
 from neural_network.early_stopping.early_stopping import EarlyStopping
 
 
 class EarlyStoppingMinimalIncrease(EarlyStopping):
     def __init__(
             self,
-            error_observer: ErrorObserver,
             minimal_increase,
             max_fails
     ):
-        super().__init__(error_observer)
+        super().__init__()
         self.__minimal_increase = minimal_increase
         self.__fail_counter = 0
         self.__last_error = sys.float_info.min

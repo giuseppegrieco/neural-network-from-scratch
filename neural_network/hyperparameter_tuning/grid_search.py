@@ -13,8 +13,9 @@ class GridSearch(object):
 
     def run(self, number_of_process: int, X_train: np.mat, Y_train: np.mat):
         with ProcessPoolExecutor(max_workers=number_of_process) as executor:
+            futures = []
             for hyperparameters in self.__grid_search_specification.combinations_of_hyperparameters():
-                executor.submit(
+                futures.append((executor.submit(
                     self.__cross_validation.estimates,
                     self.__grid_search_specification.build_neural_network_object(
                         hyperparameters
@@ -24,4 +25,12 @@ class GridSearch(object):
                     ),
                     X_train,
                     Y_train
-                )
+                ), hyperparameters))
+
+            results = []
+            for future in futures:
+                results.append({
+                    'result': future[0].result(),
+                    'hyperparameters': self.__grid_search_specification.combinations_repr(future[1])
+                })
+            return results

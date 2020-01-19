@@ -1,16 +1,16 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 import numpy as np
 
 from neural_network import NeuralNetwork
+from neural_network.early_stopping.early_stopping import EarlyStopping
 from neural_network.learning_algorithm import LearningAlgorithm
+from neural_network.learning_observer import ErrorObserver
 
 
 class CrossValidation(ABC):
-    def __init__(self):
-        self.on_finish = self._noop
-        self.on_fold_attempt_start = self._noop
-        self.on_fold_attempt_end = self._noop
+    _early_stopping_list: List[EarlyStopping] = []
 
     @abstractmethod
     def estimates(
@@ -21,29 +21,13 @@ class CrossValidation(ABC):
             Y_train: np.mat):
         pass
 
-    def _noop(self, *params):
-        pass
+    def _attach_early_stopping(self, validation_observer: ErrorObserver, learning_algorithm: LearningAlgorithm):
+        for early_stopping in self._early_stopping_list:
+            early_stopping.error_observer = validation_observer
+            learning_algorithm.attach(early_stopping)
 
-    @property
-    def on_finish(self):
-        return self._on_finish
+    def add_early_stopping(self, early_stopping: EarlyStopping) -> None:
+        self._early_stopping_list.append(early_stopping)
 
-    @on_finish.setter
-    def on_finish(self, on_finish):
-        self._on_finish = on_finish
-
-    @property
-    def on_fold_attempt_start(self):
-        return self._on_finish
-
-    @on_fold_attempt_start.setter
-    def on_fold_attempt_start(self, on_fold_attempt_start):
-        self._on_fold_attempt_start = on_fold_attempt_start
-
-    @property
-    def on_fold_attempt_end(self):
-        return self._on_fold_attempt_end
-
-    @on_fold_attempt_end.setter
-    def on_fold_attempt_end(self, on_fold_attempt_end):
-        self._on_fold_attempt_end = on_fold_attempt_end
+    def remove_early_stopping(self, early_stopping: EarlyStopping) -> None:
+        self._early_stopping_list.remove(early_stopping)

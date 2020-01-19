@@ -14,34 +14,44 @@ class GradientDescentTuningSpecs(TuningSpecs):
             learning_rate_list: List[float],
             momentum_list: List[float],
             regularization_list: List[float],
-            epochs: int
+            epochs_list: List[int]
     ):
         self.__input_size = input_size
         self.__layers_list = layers_list
         self.__learning_rate_list = learning_rate_list
         self.__momentum_list = momentum_list
         self.__regularization_list = regularization_list
-        self.__epochs = epochs
+        self.__epochs_list = epochs_list
 
     def build_neural_network_object(self, hyperparameters) -> NeuralNetwork:
         return NeuralNetwork(
             self.__input_size,
-            hyperparameters[0]
+            hyperparameters[1]
         )
 
-    def build_learning_algorithm_object(self, hyperparameters) -> GradientDescent:
+    def build_learning_algorithm_object(self, hyperparameters: List) -> GradientDescent:
         return GradientDescent(
-            learning_rate=hyperparameters[1],
-            momentum=hyperparameters[2],
-            regularization=hyperparameters[3],
-            epochs=self.__epochs
+            epochs=hyperparameters[0],
+            learning_rate=hyperparameters[2],
+            momentum=hyperparameters[3],
+            regularization=hyperparameters[4]
         )
 
-    def combinations_of_hyperparameters(self):
+    def combinations_of_hyperparameters(self) -> List:
         return [
-            [layers, learning_rate, momentum, regularization]
+            [epochs, layers, learning_rate, momentum, regularization]
+            for epochs in self.__epochs_list
             for layers in self.__layers_list
             for learning_rate in self.__learning_rate_list
             for momentum in self.__momentum_list
             for regularization in self.__regularization_list
         ]
+
+    def combinations_repr(self, hyperparameters: List):
+        return {
+            "epochs": hyperparameters[0],
+            "layers": hyperparameters[1],
+            "learning_rate": hyperparameters[2],
+            "momentum": hyperparameters[3],
+            "regularization": hyperparameters[4]
+        }
