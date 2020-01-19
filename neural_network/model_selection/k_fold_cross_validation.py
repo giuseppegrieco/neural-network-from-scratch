@@ -56,6 +56,8 @@ class KFoldCrossValidation(CrossValidation):
             })
             fold_counter += 1
             neural_network.pack()
+            learning_algorithm.detach_all()
+            learning_algorithm.stopped = False
 
         mean = mean / len(errors)
         for error in errors:

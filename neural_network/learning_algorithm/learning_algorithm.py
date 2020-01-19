@@ -23,6 +23,9 @@ class LearningAlgorithm(ABC):
     def detach(self, learning_observer: learning_algorithm.LearningObserver) -> None:
         self._learning_observers.remove(learning_observer)
 
+    def detach_all(self) -> None:
+        self._learning_observers.clear()
+
     def _notify(self):
         for learning_observer in self._learning_observers:
             learning_observer.update(self)

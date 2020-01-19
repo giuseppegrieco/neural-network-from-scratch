@@ -17,7 +17,6 @@ class EarlyStoppingMinimalIncrease(EarlyStopping):
         self.__last_error = sys.float_info.min
 
     def update(self, learning_algorithm: learning_algorithm.LearningAlgorithm) -> None:
-        print('ciao')
         if len(self._error_observer.store) > 0:
             new_error = self._error_observer.store[-1]
             if self.__last_error - new_error < self.__last_error * self.__minimal_increase:
