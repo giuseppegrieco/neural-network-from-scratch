@@ -27,7 +27,7 @@ class GridSearch(object):
                     X_train,
                     Y_train
                 ), hyperparameters))
-            executor.shutdown()
+            executor.shutdown(wait=True)
             results = []
             for future in futures:
                 results.append({
