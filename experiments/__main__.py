@@ -143,7 +143,7 @@ if __name__ == '__main__':
         output_layer_list=[Layer(2, Identity, w_init)],
         learning_rate_list=[0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001],
         momentum_list=[0.9, 0.6, 0.3, 0.1, 0],
-        regularization_correlation_list=[0.1, 0.01, 0.001, 0.0001],
+        regularization_correlation_list=[ 0.00001, 0.000001],
         regularization_pseudo_inverse_list=[0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001],
         max_nodes_list=[300],
         pool_size_list=[30],
@@ -168,7 +168,7 @@ if __name__ == '__main__':
 
     gs = GridSearch(gds, cross_validation)
 
-    grid_result = gs.run(4, X_train, Y_train)
+    grid_result = gs.run(2, X_train, Y_train)
 
     end_time_GS = datetime.datetime.now().timestamp()
     grid_search_duration_in_sec = end_time_GS - start_time_GS
