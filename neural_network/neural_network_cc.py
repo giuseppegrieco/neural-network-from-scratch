@@ -8,8 +8,8 @@ class NeuralNetworkCC(NeuralNetwork):
     def pack(self):
         output_layer = self._layers[-1]
         output_layer.initialize_weights(self._input_size)
-        self._layers = [self._layers[-1]]
-        super().pack()
+        self._layers.clear()
+        self._layers.append(output_layer)
 
     def feed_forward(self, X_train):
         current_input = Layer.add_bias_input(X_train)
