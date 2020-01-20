@@ -192,7 +192,7 @@ if __name__ == '__main__':
 
     gs = GridSearch(gds, cross_validation)
 
-    grid_result = gs.run(1, X_train, Y_train)
+    grid_result = gs.run(4, X_train, Y_train)
 
     end_time_GS = datetime.datetime.now().timestamp()
     grid_search_duration_in_sec = end_time_GS - start_time_GS
