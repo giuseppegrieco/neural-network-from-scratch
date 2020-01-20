@@ -119,7 +119,7 @@ def save_result(result):
             'mean': result['result']['mean'],
             'variance': result['result']['variance']
         }, fp)
-    for i in range(1, 5):
+    for i in range(1, 6):
         fold_directory_name = directory_name + "/fold-" + str(i)
         try:
             os.mkdir(fold_directory_name)
