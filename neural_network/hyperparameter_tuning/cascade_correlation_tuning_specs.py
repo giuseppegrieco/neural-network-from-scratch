@@ -54,8 +54,8 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
             momentum=hyperparameters[6],
             regularization_correlation=hyperparameters[7],
             regularization_pseudo_inverse=hyperparameters[8],
-            minimal_correlation_increase=hyperparameters[9],
-            max_fails_increase=hyperparameters[10]
+            minimal_correlation_increase=hyperparameters[10],
+            max_fails_increase=hyperparameters[11]
         )
 
     def combinations_of_hyperparameters(self) -> List:
