@@ -5,12 +5,12 @@ from neural_network.layers import Layer
 
 class NeuralNetwork(object):
     def __init__(self, input_size: int, layers: List[Layer]):
-        self.__input_size = input_size
+        self._input_size = input_size
         self.layers = layers
         self.pack()
 
     def pack(self):
-        in_size = self.__input_size
+        in_size = self._input_size
         for layer in self._layers:
             layer.is_hidden = True
             layer.initialize_weights(in_size)
