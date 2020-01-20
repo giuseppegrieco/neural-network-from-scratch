@@ -91,6 +91,6 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
             "regularization_correlation": hyperparameters[7],
             "regularization_pseudo_inverse": hyperparameters[8],
             "output_layer": hyperparameters[9].__repr__(),
-            'minimal_correlation_increase': hyperparameters[9],
-            'max_fails_increase': hyperparameters[10]
+            'minimal_correlation_increase': hyperparameters[10],
+            'max_fails_increase': hyperparameters[11]
         }

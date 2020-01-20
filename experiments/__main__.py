@@ -150,7 +150,7 @@ if __name__ == '__main__':
         epochs_list=[15000],
         weights_initializer_list=[w_init],
         activation_function_list=[Sigmoid],
-        minimal_correlation_increase_list=[0.01],
+        minimal_correlation_increase_list=[0.001],
         max_fails_increase_list=[50]
     )
 
