@@ -170,7 +170,7 @@ if __name__ == '__main__':
             ]
 
         ],
-        learning_rate_list=[0.00025, 0.0002, 0.0001, 0.00001],
+        learning_rate_list=[0.000001,0.0000001],
         momentum_list=[0.9, 0.6, 0.3, 0.1, 0],
         epochs_list=[15000],
         regularization_list=[0.01, 0.001, 0.0001, 0.00001, 0.000001]
