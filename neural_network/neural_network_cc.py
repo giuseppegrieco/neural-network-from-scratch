@@ -6,8 +6,6 @@ from neural_network.layers import Layer
 
 class NeuralNetworkCC(NeuralNetwork):
     def pack(self):
-        output_layer = self._layers[-1]
-        output_layer.initialize_weights(self._input_size)
         self._layers = [self._layers[-1]]
         super().pack()
 
