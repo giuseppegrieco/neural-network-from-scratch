@@ -175,6 +175,7 @@ if __name__ == '__main__':
         regularization_list=[0.01, 0.001, 0.0001, 0.00001, 0.000001]
     )
 
+
     TS = np.genfromtxt('cup/tr.csv', delimiter=',')
     TS = TS[:, 1:]
 
