@@ -102,35 +102,35 @@ def create_timestamp_directory(path, prefix=''):  # todo: mettere secondo camnpo
         raise e
     return directory_name
 
+initial_path = ''
 
-def save(grid_result, grid_search_duration_in_sec, k):
-    initial_path = create_timestamp_directory("./grid_search/", "GS-")
+def save_grid_time(grid_search_duration_in_sec):
     data = {'duration_GS': grid_search_duration_in_sec}
     with open(initial_path + '/data.json', 'w') as fp:
         json.dump(data, fp)
 
-    for result in grid_result:
-        directory_name = create_timestamp_directory(initial_path + '/', "")
+def save_result(result):
+    directory_name = create_timestamp_directory(initial_path + '/', "")
 
-        with open(directory_name + '/hyperparameters.json', 'w') as fp:
-            json.dump(result['hyperparameters'], fp)
-        with open(directory_name + '/result.json', 'w') as fp:
-            json.dump({
-                'mean': result['result']['mean'],
-                'variance': result['result']['variance']
-            }, fp)
-        for i in range(1, k + 1):
-            fold_directory_name = directory_name + "/fold-" + str(i)
-            try:
-                os.mkdir(fold_directory_name)
-            except FileExistsError as e:
-                raise e
-            fold = result['result'][str(i)]
-            np.save(fold_directory_name + "/initial_weights", fold['initial_weights'])
-            np.save(fold_directory_name + "/training_errors", fold['training_errors'])
-            np.save(fold_directory_name + "/validation_errors", fold['validation_errors'])
-            with open(fold_directory_name + '/result.json', 'w') as fp:
-                json.dump({'validation_score': fold['validation_score']}, fp)
+    with open(directory_name + '/hyperparameters.json', 'w') as fp:
+        json.dump(result['hyperparameters'], fp)
+    with open(directory_name + '/result.json', 'w') as fp:
+        json.dump({
+            'mean': result['result']['mean'],
+            'variance': result['result']['variance']
+        }, fp)
+    for i in range(1, 5):
+        fold_directory_name = directory_name + "/fold-" + str(i)
+        try:
+            os.mkdir(fold_directory_name)
+        except FileExistsError as e:
+            raise e
+        fold = result['result'][str(i)]
+        np.save(fold_directory_name + "/initial_weights", fold['initial_weights'])
+        np.save(fold_directory_name + "/training_errors", fold['training_errors'])
+        np.save(fold_directory_name + "/validation_errors", fold['validation_errors'])
+        with open(fold_directory_name + '/result.json', 'w') as fp:
+            json.dump({'validation_score': fold['validation_score']}, fp)
 
 
 if __name__ == '__main__':
@@ -143,7 +143,7 @@ if __name__ == '__main__':
         output_layer_list=[Layer(2, Identity, w_init)],
         learning_rate_list=[0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001],
         momentum_list=[0.9, 0.6, 0.3, 0.1, 0],
-        regularization_correlation_list=[ 0.00001, 0.000001],
+        regularization_correlation_list=[0.00001, 0.000001],
         regularization_pseudo_inverse_list=[0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001],
         max_nodes_list=[300],
         pool_size_list=[30],
@@ -168,11 +168,12 @@ if __name__ == '__main__':
 
     gs = GridSearch(gds, cross_validation)
 
-    grid_result = gs.run(2, X_train, Y_train)
+    initial_path = create_timestamp_directory("./grid_search/", "GS-")
+
+    grid_result = gs.run(2, X_train, Y_train, save_result)
 
     end_time_GS = datetime.datetime.now().timestamp()
     grid_search_duration_in_sec = end_time_GS - start_time_GS
-
-    save(grid_result, grid_search_duration_in_sec, 5)
+    save_grid_time(grid_search_duration_in_sec)
 
     sys.exit(0)
