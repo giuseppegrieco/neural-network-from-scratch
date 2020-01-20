@@ -162,10 +162,10 @@ if __name__ == '__main__':
 
     cross_validation = KFoldCrossValidation(5, MeanSquaredError)
     cross_validation.add_early_stopping(
-        EarlyStoppingMinimalIncrease(0.00001, 100)
+        EarlyStoppingMinimalIncrease(0.00001, 20)
     )
     cross_validation.add_early_stopping(
-        EarlyStoppingValidationScore(100)
+        EarlyStoppingValidationScore(10)
     )
 
     gs = GridSearch(gds, cross_validation)
