@@ -19,7 +19,9 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
             pool_size_list: List[int],
             epochs_list: List[int],
             weights_initializer_list: List[WeightsInitializer],
-            activation_function_list: List
+            activation_function_list: List,
+            minimal_correlation_increase_list: List[float],
+            max_fails_increase_list: List[int]
     ):
         self.__input_size = input_size
         self.__output_layer_list = output_layer_list
@@ -32,6 +34,8 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
         self.__epochs_list = epochs_list
         self.__weights_initializer_list = weights_initializer_list
         self.__activation_function_list = activation_function_list
+        self.__minimal_correlation_increase_list = minimal_correlation_increase_list
+        self.__max_fails_increase_list = max_fails_increase_list
 
     def build_neural_network_object(self, hyperparameters: List) -> NeuralNetworkCC:
         return NeuralNetworkCC(
@@ -49,14 +53,17 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
             learning_rate=hyperparameters[5],
             momentum=hyperparameters[6],
             regularization_correlation=hyperparameters[7],
-            regularization_pseudo_inverse=hyperparameters[8]
+            regularization_pseudo_inverse=hyperparameters[8],
+            minimal_correlation_increase=hyperparameters[9],
+            max_fails_increase=hyperparameters[10]
         )
 
     def combinations_of_hyperparameters(self) -> List:
         return [
             [
                 activation_function, weights_initializer, epochs, pool_size, max_nodes, learning_rate,
-                momentum, regularization_correlation, regularization_pseudo_inverse, output_layer
+                momentum, regularization_correlation, regularization_pseudo_inverse, output_layer,
+                minimal_correlation_increase, max_fails_increase
             ]
             for output_layer in self.__output_layer_list
             for activation_function in self.__activation_function_list
@@ -68,6 +75,8 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
             for momentum in self.__momentum_list
             for regularization_correlation in self.__regularization_correlation_list
             for regularization_pseudo_inverse in self.__regularization_pseudo_inverse_list
+            for minimal_correlation_increase in self.__minimal_correlation_increase_list
+            for max_fails_increase in self.__max_fails_increase_list
         ]
 
     def combinations_repr(self, hyperparameters: List):
@@ -81,5 +90,7 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
             "momentum": hyperparameters[6],
             "regularization_correlation": hyperparameters[7],
             "regularization_pseudo_inverse": hyperparameters[8],
-            "output_layer": hyperparameters[9].__repr__()
+            "output_layer": hyperparameters[9].__repr__(),
+            'minimal_correlation_increase': hyperparameters[9],
+            'max_fails_increase': hyperparameters[10]
         }

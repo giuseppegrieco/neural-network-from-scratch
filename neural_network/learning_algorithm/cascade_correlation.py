@@ -20,7 +20,9 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
             weights_initializer: WeightsInitializer,
             epochs: int,
             max_nodes: int,
-            pool_size: int
+            pool_size: int,
+            minimal_correlation_increase: int,
+            max_fails_increase: int
     ):
         super().__init__()
         self.__learning_rate = learning_rate
@@ -33,6 +35,8 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
         self.__last_output = None
         self.__max_nodes = max_nodes
         self.__pool_size = pool_size
+        self.__minimal_correlation_increase = minimal_correlation_increase
+        self.__max_fails_increase = max_fails_increase
 
     def train(self, neural_network: NeuralNetworkCC, X_train: np.mat, Y_train: np.mat):
         X_train = Layer.add_bias_input(X_train)
@@ -85,7 +89,7 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
             E_tot
         )
         delta_old = np.zeros(hidden_layer.weights.shape)
-        i = 10
+        i = self.__max_fails_increase
         current_epoch = 0
         max_correlation = sys.float_info.min
         max_weights = hidden_layer.weights
@@ -112,12 +116,13 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
                 hidden_layer.computes(current_input),
                 E_tot
             )
+            if new_correlation - max_correlation < max_correlation * self.__minimal_correlation_increase:
+                i -= 1
+            else:
+                i = self.__max_fails_increase
             if new_correlation > max_correlation:
                 max_correlation = new_correlation
                 max_weights = hidden_layer.weights
-                i = 10
-            else:
-                i -= 1
             current_epoch += 1
 
         hidden_layer.weights = max_weights

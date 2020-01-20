@@ -149,7 +149,9 @@ if __name__ == '__main__':
         pool_size_list=[30],
         epochs_list=[15000],
         weights_initializer_list=[w_init],
-        activation_function_list=[Sigmoid]
+        activation_function_list=[Sigmoid],
+        minimal_correlation_increase_list=[0.01],
+        max_fails_increase_list=[50]
     )
 
 
