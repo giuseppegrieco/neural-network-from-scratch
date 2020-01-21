@@ -3,22 +3,27 @@ from typing import List
 import numpy as np
 
 from neural_network import NeuralNetwork
-from neural_network.learning_algorithm import LearningAlgorithm
 from neural_network.learning_observer import LearningObserver
 
 
 class ErrorObserver(LearningObserver):
-    def __init__(self, neural_network: NeuralNetwork, X: np.mat, Y: np.mat, error_function):
+    def __init__(self, X: np.mat, Y: np.mat, error_function):
         self.store = []
-        self.__neural_network = neural_network
         self._X = X
         self._Y = Y
-        self.__error_function = error_function
+        self._error_function = error_function
+        self._predicted_Y = None
 
-    def update(self, learning_algorithm: LearningAlgorithm) -> None:
-        predicted_Y = self.__neural_network.feed_forward(self._X)
+    def update(
+            self,
+            learning_algorithm,
+            neural_network: NeuralNetwork,
+            X_train: np.mat,
+            Y_train: np.mat
+    ) -> None:
+        self._predicted_Y = neural_network.feed_forward(self._X)
         self._store.append(
-            self.__error_function.evaluate(self._Y - predicted_Y)
+            self._error_function.evaluate(self._Y - self._predicted_Y)
         )
 
     @property
