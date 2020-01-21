@@ -1,11 +1,13 @@
 import datetime
 import json
+import logging
 import os
+import pickle
 import sys
 import numpy as np
 
 from neural_network.early_stopping import EarlyStoppingMinimalIncrease, EarlyStoppingValidationScore
-from neural_network.functions import Sigmoid, Identity, MeanSquaredError
+from neural_network.functions import Sigmoid, Identity, MeanSquaredError, MeanEuclideanError
 from neural_network.hyperparameter_tuning import GridSearch, CascadeCorrelationTuningSpecs, GradientDescentTuningSpecs
 from neural_network.layers import Layer, RandomNormalInitializer
 from neural_network.learning_algorithm import CascadeCorrelation
@@ -52,7 +54,17 @@ def plotgraph(training_errors, validation_errors):
     subplot.legend()
     plt.show()
 
-    print(min(validation_errors))
+
+class DebugErrorObserverV(ErrorObserver):
+    def update(self, learning_algorithm) -> None:
+        super().update(learning_algorithm)
+        logging.debug('Validation MSE: %f' % self._store[-1])
+
+
+class DebugErrorObserverT(ErrorObserver):
+    def update(self, learning_algorithm) -> None:
+        super().update(learning_algorithm)
+        logging.debug('Training MSE: %f' % self._store[-1])
 
 
 def cascade():
@@ -74,18 +86,20 @@ def cascade():
         ]
     )
     cc = CascadeCorrelation(
-        learning_rate=0.4,
+        learning_rate=0.0001,
         momentum=0.6,
-        regularization_correlation=0.01,
-        regularization_pseudo_inverse=0.0006,
+        regularization_correlation=0.00001,
+        regularization_pseudo_inverse=0.001,
         activation_function=Sigmoid,
         weights_initializer=w_init,
-        epochs=100,
-        max_nodes=100,
-        pool_size=10
+        epochs=15000,
+        max_nodes=50,
+        pool_size=15,
+        minimal_correlation_increase=0.0001,
+        max_fails_increase=100
     )
-    e1 = ErrorObserver(neural_network=my_nn, X=X_train, Y=Y_train, error_function=MeanSquaredError)
-    e2 = ErrorObserver(neural_network=my_nn, X=X_val, Y=Y_val, error_function=MeanSquaredError)
+    e1 = DebugErrorObserverT(neural_network=my_nn, X=X_train, Y=Y_train, error_function=MeanSquaredError)
+    e2 = DebugErrorObserverV(neural_network=my_nn, X=X_val, Y=Y_val, error_function=MeanSquaredError)
     cc.attach(e1)
     cc.attach(e2)
     cc.train(neural_network=my_nn, X_train=X_train, Y_train=Y_train)
@@ -102,12 +116,15 @@ def create_timestamp_directory(path, prefix=''):  # todo: mettere secondo camnpo
         raise e
     return directory_name
 
+
 initial_path = ''
+
 
 def save_grid_time(grid_search_duration_in_sec):
     data = {'duration_GS': grid_search_duration_in_sec}
     with open(initial_path + '/data.json', 'w') as fp:
         json.dump(data, fp)
+
 
 def save_result(result):
     directory_name = create_timestamp_directory(initial_path + '/', "")
@@ -127,13 +144,31 @@ def save_result(result):
             raise e
         fold = result['result'][str(i)]
         np.save(fold_directory_name + "/initial_weights", fold['initial_weights'])
-        np.save(fold_directory_name + "/training_errors", fold['training_errors'])
-        np.save(fold_directory_name + "/validation_errors", fold['validation_errors'])
+        np.save(fold_directory_name + "/training_errors_mse", fold['training_curve_errors'])
+        np.save(fold_directory_name + "/validation_errors_mse", fold['validation_curve_errors'])
+        np.save(fold_directory_name + "/training_errors_mee", fold['validation_curve_errors'])
+        np.save(fold_directory_name + "/validation_errors_mee", fold['validation_evaluation_errors'])
         with open(fold_directory_name + '/result.json', 'w') as fp:
             json.dump({'validation_score': fold['validation_score']}, fp)
 
 
+def generatefolds(X_train, Y_train):
+    X_train_splitted, Y_train_splitted = KFoldCrossValidation.split_in_k_fold(X_train, Y_train, 5)
+
+    i = 1
+    for fold in X_train_splitted:
+        np.save('k-folds/X_%d' % i, fold)
+        i += 1
+
+    i = 1
+    for fold in Y_train_splitted:
+        np.save('k-folds/Y_%d' % i, fold)
+        i += 1
+
+
 if __name__ == '__main__':
+    # logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+
     start_time_GS = datetime.datetime.now().timestamp()
 
     w_init = RandomNormalInitializer()
@@ -141,28 +176,29 @@ if __name__ == '__main__':
     gds = CascadeCorrelationTuningSpecs(
         input_size=20,
         output_layer_list=[Layer(2, Identity, w_init)],
-        learning_rate_list=[0.0005, 0.0001, 0.00001, 0.000001, 0.0000001],
-        momentum_list=[0.9, 0.6, 0.3, 0.1, 0],
-        regularization_correlation_list=[0.00001, 0.000001],
-        regularization_pseudo_inverse_list=[0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001],
-        max_nodes_list=[300],
+
+        learning_rate_list=[0.5, 0.1, 0.01, 0.001, 0.0001],
+        momentum_list=[0.9],
+        regularization_correlation_list=[0.001],
+        regularization_pseudo_inverse_list=[0.1],
+        max_nodes_list=[30],
         pool_size_list=[10],
-        epochs_list=[10000],
+        epochs_list=[500],
         weights_initializer_list=[w_init],
         activation_function_list=[Sigmoid],
         minimal_correlation_increase_list=[0.001],
         max_fails_increase_list=[50]
     )
 
+    X_folds = []
+    Y_folds = []
 
+    for i in range(1, 6):
+        X_folds.append(np.load("k-folds/X_%d.npy" % i, allow_pickle=False))
+        Y_folds.append(np.load("k-folds/Y_%d.npy" % i, allow_pickle=False))
 
-    TS = np.genfromtxt('cup/tr.csv', delimiter=',')
-    TS = TS[:, 1:]
+    cross_validation = KFoldCrossValidation((X_folds, Y_folds), MeanSquaredError, MeanEuclideanError)
 
-    X_train = TS[:, :-2].T
-    Y_train = TS[:, -2:].T
-
-    cross_validation = KFoldCrossValidation(5, MeanSquaredError)
     cross_validation.add_early_stopping(
         EarlyStoppingMinimalIncrease(0.00001, 20)
     )
@@ -174,7 +210,8 @@ if __name__ == '__main__':
 
     initial_path = create_timestamp_directory("./grid_search/", "GS-")
 
-    grid_result = gs.run(2, X_train, Y_train, save_result)
+
+    grid_result = gs.run(2, save_result)
 
     end_time_GS = datetime.datetime.now().timestamp()
     grid_search_duration_in_sec = end_time_GS - start_time_GS

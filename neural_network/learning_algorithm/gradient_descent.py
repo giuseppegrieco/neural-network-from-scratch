@@ -21,18 +21,25 @@ class GradientDescent(learning_algorithm.LearningAlgorithm):
         self._epochs = epochs
 
     def train(self, neural_network: neural_network.NeuralNetwork, X_train: np.mat, Y_train: np.mat):
+        super().train(neural_network, X_train, Y_train)
+        self._stopped = False
         momentum_memory = [0] * len(neural_network.layers)
-        i = 0
+        i = 000
         while i < self._epochs and not self._stopped:
             predicted_Y = neural_network.feed_forward(X_train)
 
             gradients = self.__back_propagation(neural_network, Y_train, predicted_Y)
             j = 0
             for gradient in reversed(gradients):
-                momentum_memory[j] = self.update_weights(neural_network.layers[j], gradient, momentum_memory[j])
+                momentum_memory[j] = self.update_weights(
+                    neural_network.layers[j],
+                    gradient,
+                    momentum_memory[j],
+                    len(X_train.T)
+                )
                 j += 1
 
-            self._notify()
+            self._notify(neural_network, X_train, Y_train)
             i += 1
 
     @staticmethod
@@ -52,7 +59,7 @@ class GradientDescent(learning_algorithm.LearningAlgorithm):
 
         return gradients
 
-    def update_weights(self, layer, gradient: np.mat, momentum_stored):
+    def update_weights(self, layer, gradient: np.mat, momentum_stored, n_pattern):
         layer_weights = layer.weights
 
         lambda_mat = np.full(layer_weights.shape, -self._regularization)
@@ -60,8 +67,8 @@ class GradientDescent(learning_algorithm.LearningAlgorithm):
             lambda_mat[:, 0] = 0.0
         regularization = np.multiply(lambda_mat, layer_weights)
 
-        adding_factor = (-self._learning_rate * gradient) + (self._momentum * momentum_stored) + regularization
+        delta_w = (-self._learning_rate * 1 / n_pattern * gradient) + (self._momentum * momentum_stored) + regularization
 
-        layer.weights = layer_weights + adding_factor
+        layer.weights = layer_weights + delta_w
 
-        return adding_factor
+        return delta_w
