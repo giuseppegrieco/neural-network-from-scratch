@@ -204,7 +204,7 @@ if __name__ == '__main__':
             ]
 
         ],
-        learning_rate_list=[0.5, 0.2, 0.1, 0.01],
+        learning_rate_list=[0.001,0.0001],
         momentum_list=[0.9, 0.6, 0.3, 0.1, 0],
         epochs_list=[15000],
         regularization_list=[0.01, 0.001, 0.0001, 0.00001, 0.000001]
@@ -233,7 +233,7 @@ if __name__ == '__main__':
     initial_path = create_timestamp_directory("./grid_search/", "GS-")
 
 
-    grid_result = gs.run(4, save_result)
+    grid_result = gs.run(2, save_result)
 
     end_time_GS = datetime.datetime.now().timestamp()
     grid_search_duration_in_sec = end_time_GS - start_time_GS
