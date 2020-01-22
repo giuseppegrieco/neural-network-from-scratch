@@ -178,7 +178,7 @@ if __name__ == '__main__':
         output_layer_list=[Layer(2, Identity, w_init)],
         learning_rate_list=[0.5, 0.1, 0.01, 0.001, 0.0001],
         momentum_list=[0.9, 0.6, 0.3, 0.1, 0],
-        regularization_correlation_list=[0.1, 0.01, 0.001, 0.0001],
+        regularization_correlation_list=[0.00001, 0.000001],
         regularization_pseudo_inverse_list=[0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001],
         max_nodes_list=[300],
         pool_size_list=[10],
@@ -201,10 +201,10 @@ if __name__ == '__main__':
     cross_validation = KFoldCrossValidation((X_folds, Y_folds), MeanSquaredError, MeanEuclideanError)
 
     cross_validation.add_early_stopping(
-        EarlyStoppingMinimalIncrease(0.00001, 100)
+        EarlyStoppingMinimalIncrease(0.0001, 20)
     )
     cross_validation.add_early_stopping(
-        EarlyStoppingValidationScore(100)
+        EarlyStoppingValidationScore(10)
     )
 
     gs = GridSearch(gds, cross_validation)
