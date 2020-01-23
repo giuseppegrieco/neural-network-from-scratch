@@ -37,8 +37,9 @@ class Layer(object):
 
     @staticmethod
     def add_bias_input(target):
-        bias = np.ones((1, len(target.T)))
-        return np.vstack((target, bias))
+        n, m = target.shape
+        bias = np.ones((1, m), dtype=np.dtype('d'))
+        return np.vstack((bias, target))
 
     def initialize_weights(self, in_size):
         self.__weights_initializer.initializes(self, (self.__number_of_nodes, in_size + 1))
