@@ -130,11 +130,10 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
 
             # Update the weights
             delta_w = (self.__learning_rate * 1 / len(X_train.T) * delta) + \
-                      (self.__momentum * momentum_store) + \
-                      (-self.__regularization_correlation * hidden_layer.weights)
+                      (self.__momentum * momentum_store)
             hidden_layer.weights = (
                     hidden_layer.weights +
-                    delta_w
+                    delta_w + (-self.__regularization_correlation * hidden_layer.weights)
             )
             momentum_store = delta_w
 

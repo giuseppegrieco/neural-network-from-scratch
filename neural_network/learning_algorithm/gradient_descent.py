@@ -24,7 +24,7 @@ class GradientDescent(learning_algorithm.LearningAlgorithm):
         super().train(neural_network, X_train, Y_train)
         self._stopped = False
         momentum_memory = [0] * len(neural_network.layers)
-        i = 000
+        i = 0
         while i < self._epochs and not self._stopped:
             predicted_Y = neural_network.feed_forward(X_train)
 
@@ -67,8 +67,8 @@ class GradientDescent(learning_algorithm.LearningAlgorithm):
             lambda_mat[:, 0] = 0.0
         regularization = np.multiply(lambda_mat, layer_weights)
 
-        delta_w = (-self._learning_rate * 1 / n_pattern * gradient) + (self._momentum * momentum_stored) + regularization
+        delta_w = (-self._learning_rate * 1 / n_pattern * gradient) + (self._momentum * momentum_stored)
 
-        layer.weights = layer_weights + delta_w
+        layer.weights = layer_weights + delta_w + regularization
 
         return delta_w
