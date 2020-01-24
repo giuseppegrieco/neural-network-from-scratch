@@ -40,20 +40,22 @@ def plotgraph(directory, training_errors, validation_errors, eta, alpha, lam, fn
 file = sys.argv[1]
 
 for directory in os.listdir(file):
-    if directory != '.DS_Store' and directory != "run.json":
-        with open(file + directory + '/hyperparameters.json', 'r') as myfile:
-            data = myfile.read()
+    if directory != '.DS_Store' and directory != "result.json":
+        try:
+            with open(file + directory + '/hyperparameters.json', 'r') as myfile:
+                data = myfile.read()
 
-        obj = json.loads(data)
-        layers = [[int(s) for s in layer_repr.split() if s.isdigit()] for layer_repr in obj['layers']]
-        topology = layers[0]
-        lr = float(obj['learning_rate'])
-        lambda_reg = float(obj['regularization'])
-        momentum = float(obj['momentum'])
+            obj = json.loads(data)
+            topology = int(obj['layers'][0].split(',')[0].split('=')[1])
+            lr = float(obj['learning_rate'])
+            lambda_reg = float(obj['regularization'])
+            momentum = float(obj['momentum'])
 
-        for sub_dir in os.listdir(directory):
-            tr_errors = np.load(sub_dir + "training_errors_mse.npy", allow_pickle=False)
-            vl_errors = np.load(sub_dir + "validation_errors_mse.npy", allow_pickle=False)
-            plotgraph(directory, tr_errors, vl_errors, lr, momentum, lambda_reg, topology, 2)
-
+            for sub_dir in os.listdir(file + directory):
+                if sub_dir != '.DS_Store' and sub_dir != "result.json" and sub_dir != "hyperparameters.json":
+                    tr_errors = np.load(file + directory +'/'+ sub_dir + "/training_errors_mse.npy", allow_pickle=False)
+                    vl_errors = np.load(file + directory + '/'+ sub_dir + "/validation_errors_mse.npy", allow_pickle=False)
+                    plotgraph(file + directory + '/'+ sub_dir + '/', tr_errors, vl_errors, lr, momentum, lambda_reg, topology, 2)
+        except:
+            print(file + directory)
 sys.exit()
