@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import xlsxwriter
+import numpy as np
 
 file = sys.argv[1]
 
@@ -11,6 +12,9 @@ worksheet_mean = workbook.add_worksheet(
 )
 worksheet_variance = workbook.add_worksheet(
     "variance"
+)
+worksheet_nodes = workbook.add_worksheet(
+    "nodes"
 )
 heads = workbook.add_format({
     'bold': True,
@@ -43,13 +47,13 @@ for worksheet in workbook.worksheets():
         0.9, 0.6, 0.3, 0.1, 0
     ]
     rows = [
-        10, 50, 100, 150, 200, 250, 300
+        0.1,0.01, 0.001, 0.0001, 0.00001, 0.000001
     ]
     sub_columns = [
-        0.01, 0.001, 0.0001, 0.00001, 0.000001
+        0.1,0.01, 0.001, 0.0001, 0.00001, 0.000001
     ]
     sub_rows = [
-        0.5, 0.2, 0.1, 0.01, 0.001, 0.0001
+        0.5, 0.1, 0.01, 0.001, 0.0001
     ]
 
     i = 0
@@ -98,12 +102,15 @@ for directory in os.listdir(file):
     if directory != '.DS_Store' and directory != "run.json" and directory != 'data.json' and directory != 'data copia.json':
         with open(file + directory + '/hyperparameters.json', 'r') as myfile:
             data = myfile.read()
-
+        avg = 0
+        for i in range(1,6):
+            mse = np.load(file + directory + '/fold-' + str(i)+'/validation_errors_mse.npy')
+            avg += len(mse)
+        avg = avg / 5
         obj = json.loads(data)
-        layers = int(obj['layers'][0].split(',')[0].split('=')[1])
-        topology = layers
+        reg_pseudo = float(obj['regularization_pseudo_inverse'])
         lr = float(obj['learning_rate'])
-        lambda_reg = float(obj['regularization'])
+        reg_correlation = float(obj['regularization_correlation'])
         momentum = float(obj['momentum'])
 
         with open(file + directory + '/result.json', 'r') as myfile:
@@ -112,18 +119,23 @@ for directory in os.listdir(file):
         average = float(obj['mean'])
         variance = float(obj['variance'])
 
-        row = 2 + (rows.index(topology) * len(sub_rows)) + sub_rows.index(lr)
-        column = 2 + (columns.index(momentum) * len(sub_columns)) + sub_columns.index(lambda_reg)
+        row = 2 + (rows.index(reg_pseudo) * len(sub_rows)) + sub_rows.index(lr)
+        column = 2 + (columns.index(momentum) * len(sub_columns)) + sub_columns.index(reg_correlation)
         worksheet_mean.write_number(
             row,
             column,
             average,
-            normal if average < 2 else h_error,
+            normal if average < 1.4 else h_error,
         )
         worksheet_variance.write_number(
             row,
             column,
             variance
+        )
+        worksheet_nodes.write_number(
+            row,
+            column,
+            avg
         )
 
 workbook.close()

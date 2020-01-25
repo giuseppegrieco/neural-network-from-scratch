@@ -6,9 +6,10 @@ import xlsxwriter
 file = sys.argv[1]
 
 lr_to_find = float(sys.argv[2])
-reg_to_find = float(sys.argv[3])
-mom_to_find = float(sys.argv[4])
-nodes_to_find = int(sys.argv[5])
+reg_correlation_to_find = float(sys.argv[3])
+reg_pseudo_to_find = float(sys.argv[4])
+mom_to_find = float(sys.argv[5])
+
 
 for directory in os.listdir(file):
     if directory != '.DS_Store' and directory != "run.json" and directory != 'data.json' and directory != 'data copia.json':
@@ -16,13 +17,12 @@ for directory in os.listdir(file):
             data = myfile.read()
 
         obj = json.loads(data)
-        layers = int(obj['layers'][0].split(',')[0].split('=')[1])
-        topology = layers
+        reg_pseudo = float(obj['regularization_pseudo_inverse'])
         lr = float(obj['learning_rate'])
-        lambda_reg = float(obj['regularization'])
+        reg_correlation = float(obj['regularization_correlation'])
         momentum = float(obj['momentum'])
 
-        if lr_to_find == lr and reg_to_find == lambda_reg and mom_to_find == momentum and nodes_to_find == topology:
+        if lr_to_find == lr and reg_pseudo_to_find == reg_pseudo and mom_to_find == momentum and reg_correlation_to_find == reg_correlation:
             print(directory)
 
 
