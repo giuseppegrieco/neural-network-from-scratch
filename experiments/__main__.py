@@ -177,11 +177,7 @@ if __name__ == '__main__':
         input_size=20,
         layers_list=[
             [
-                Layer(250, Sigmoid, w_init), # 4 core_1
-                Layer(2, Identity, w_init)
-            ],
-            [
-                Layer(275, Sigmoid, w_init),# 4 core_1
+                Layer(200, Sigmoid, w_init),
                 Layer(2, Identity, w_init)
             ]
         ],
@@ -211,7 +207,7 @@ if __name__ == '__main__':
 
     initial_path = create_timestamp_directory("./grid_search/", "GS-")
 
-    grid_result = gs.run(4, save_result)
+    grid_result = gs.run(2, save_result)
 
     end_time_GS = datetime.datetime.now().timestamp()
     grid_search_duration_in_sec = end_time_GS - start_time_GS
