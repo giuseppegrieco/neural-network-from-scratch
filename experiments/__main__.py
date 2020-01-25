@@ -177,12 +177,12 @@ if __name__ == '__main__':
         input_size=20,
         layers_list=[
             [
-                Layer(225, Sigmoid, w_init),
+                Layer(125, Sigmoid, w_init),
                 Layer(2, Identity, w_init)
             ]
         ],
-        learning_rate_list=[0.01, 0.007, 0.004, 0.001],
-        momentum_list=[0.9, 0.8, 0.7, 0.6],
+        learning_rate_list=[0.1, 0.07, 0.04, 0.01],
+        momentum_list=[0.9, 0.75, 0.6, 0.45, 0.3, 0.2, 0.1],
         epochs_list=[15000],
         regularization_list=[0.0001, 0.00005, 0.00001, 0.000005, 0.000001]
     )
