@@ -179,7 +179,7 @@ if __name__ == '__main__':
         learning_rate_list=[0.5, 0.25, 0.1],
         momentum_list=[0.1, 0.2, 0.3, 0.45, 0.6],
         regularization_correlation_list=[0.001, 0.0005, 0.0001, 0.00005, 0.00001, 0.000005, 0.000001],
-        regularization_pseudo_inverse_list=[0.01, 0.007, 0.004, 0.001],
+        regularization_pseudo_inverse_list=[0.1, 0.07, 0.04],
         max_nodes_list=[300],
         pool_size_list=[10],
         epochs_list=[10000],
