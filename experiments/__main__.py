@@ -177,15 +177,18 @@ if __name__ == '__main__':
         input_size=20,
         layers_list=[
             [
-                Layer(150, Sigmoid, w_init),
-                Layer(200, Sigmoid, w_init),
+                Layer(250, Sigmoid, w_init), # 4 core_1
+                Layer(2, Identity, w_init)
+            ],
+            [
+                Layer(275, Sigmoid, w_init),# 4 core_1
                 Layer(2, Identity, w_init)
             ]
         ],
-        learning_rate_list=[0.5, 0.2, 0.1, 0.01, 0.001, 0.0001],
-        momentum_list=[0.9, 0.6, 0.3, 0.1, 0],
+        learning_rate_list=[0.01, 0.007, 0.004, 0.001],
+        momentum_list=[0.9, 0.8, 0.7, 0.6],
         epochs_list=[15000],
-        regularization_list=[0.01, 0.001, 0.0001, 0.00001, 0.000001]
+        regularization_list=[0.0001, 0.00005, 0.00001, 0.000005, 0.000001]
     )
 
     X_folds = []
@@ -208,7 +211,7 @@ if __name__ == '__main__':
 
     initial_path = create_timestamp_directory("./grid_search/", "GS-")
 
-    grid_result = gs.run(2, save_result)
+    grid_result = gs.run(4, save_result)
 
     end_time_GS = datetime.datetime.now().timestamp()
     grid_search_duration_in_sec = end_time_GS - start_time_GS
