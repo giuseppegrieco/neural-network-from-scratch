@@ -173,18 +173,20 @@ if __name__ == '__main__':
 
     w_init = RandomNormalInitializer()
 
-    gds = GradientDescentTuningSpecs(
+    gds = CascadeCorrelationTuningSpecs(
         input_size=20,
-        layers_list=[
-            [
-                Layer(125, Sigmoid, w_init),
-                Layer(2, Identity, w_init)
-            ]
-        ],
-        learning_rate_list=[0.1, 0.07, 0.04, 0.01],
-        momentum_list=[0.9, 0.75, 0.6, 0.45, 0.3, 0.2, 0.1],
-        epochs_list=[15000],
-        regularization_list=[0.0001, 0.00005, 0.00001, 0.000005, 0.000001]
+        output_layer_list=[Layer(2, Identity, w_init)],
+        learning_rate_list=[0.5, 0.25, 0.1],
+        momentum_list=[0.1, 0.2, 0.3, 0.45, 0.6],
+        regularization_correlation_list=[0.001, 0.0005, 0.0001, 0.00005, 0.00001, 0.000005, 0.000001],
+        regularization_pseudo_inverse_list=[0.01, 0.007, 0.004, 0.001],
+        max_nodes_list=[300],
+        pool_size_list=[10],
+        epochs_list=[10000],
+        weights_initializer_list=[w_init],
+        activation_function_list=[Sigmoid],
+        minimal_correlation_increase_list=[0.001],
+        max_fails_increase_list=[50]
     )
 
     X_folds = []
@@ -197,17 +199,17 @@ if __name__ == '__main__':
     cross_validation = KFoldCrossValidation((X_folds, Y_folds), MeanSquaredError, MeanEuclideanError)
 
     cross_validation.add_early_stopping(
-        EarlyStoppingMinimalIncrease(0.00001, 100)
+        EarlyStoppingMinimalIncrease(0.0001, 20)
     )
     cross_validation.add_early_stopping(
-        EarlyStoppingValidationScore(100)
+        EarlyStoppingValidationScore(10)
     )
 
     gs = GridSearch(gds, cross_validation)
 
     initial_path = create_timestamp_directory("./grid_search/", "GS-")
 
-    grid_result = gs.run(2, save_result)
+    grid_result = gs.run(4, save_result)
 
     end_time_GS = datetime.datetime.now().timestamp()
     grid_search_duration_in_sec = end_time_GS - start_time_GS
