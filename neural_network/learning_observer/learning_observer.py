@@ -21,4 +21,13 @@ class LearningObserver(ABC):
             X_train: np.mat,
             Y_train: np.mat
     ) -> None:
+        """
+        This method is called at each iteration of the learning algorithm.
+
+        :param learning_algorithm: LearningAlgorithm
+        :param neural_network: NeuralNetwork
+        :param X_train: np.mat
+        :param Y_train: np.mat
+        :return:
+        """
         pass

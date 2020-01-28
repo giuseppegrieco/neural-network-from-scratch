@@ -11,6 +11,15 @@ from neural_network.model_selection.error_evaluation_observer import ErrorEvalua
 
 class KFoldCrossValidation(CrossValidation):
     def __init__(self, folds, error_function_learning_curve, error_function_evaluation):
+        """
+        This is the constructor for the class KFoldCrossValidation, and is used
+        to specify the folds to use, the error function to use to generates the errors for learning curve
+        and the error function to use for the evaluation.
+
+        :param folds: List
+        :param error_function_learning_curve: Function class
+        :param error_function_evaluation: Function class
+        """
         super().__init__()
         self.__k = len(folds[0])
         self.__folds = folds
@@ -22,6 +31,13 @@ class KFoldCrossValidation(CrossValidation):
             neural_network: NeuralNetwork,
             learning_algorithm: LearningAlgorithm
     ):
+        """
+        Performs an estimation of mean and variance for specific combination of hyperparameters.
+
+        :param neural_network: NeuralNetwork
+        :param learning_algorithm: LearningAlgorithm
+        :return: mean and variance obtained over the folds
+        """
         mean = 0
         variance = 0
         errors = []
@@ -91,6 +107,13 @@ class KFoldCrossValidation(CrossValidation):
         return folds
 
     def folds_combination(self) -> List:
+        """
+        It returns the fold combination in form of array where the first row is the training set
+        and the second row is the validation set, otherwise on the column we have first column
+        for input and second column for output.
+
+        :return: List
+        """
         X_train_splitted, Y_train_splitted = self.__folds
         result = []
         for i in range(0, self.__k):

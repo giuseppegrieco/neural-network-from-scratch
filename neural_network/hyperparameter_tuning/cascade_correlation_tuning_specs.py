@@ -23,6 +23,23 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
             minimal_correlation_increase_list: List[float],
             max_fails_increase_list: List[int]
     ):
+        """
+        This is the constructor for the class CascadeCorrelationTuningSpecs.
+
+        :param input_size: int
+        :param output_layer_list: List[Layer]
+        :param learning_rate_list: List[float]
+        :param momentum_list: List[float]
+        :param regularization_correlation_list: List[float]
+        :param regularization_pseudo_inverse_list: List[float]
+        :param max_nodes_list: List[int]
+        :param pool_size_list: List[int]
+        :param epochs_list: List[int]
+        :param weights_initializer_list: List[WeightsInitializer]
+        :param activation_function_list: List
+        :param minimal_correlation_increase_list: List[float]
+        :param max_fails_increase_list: List[int]
+        """
         self.__input_size = input_size
         self.__output_layer_list = output_layer_list
         self.__learning_rate_list = learning_rate_list
@@ -38,12 +55,26 @@ class CascadeCorrelationTuningSpecs(TuningSpecs):
         self.__max_fails_increase_list = max_fails_increase_list
 
     def build_neural_network_object(self, hyperparameters: List) -> NeuralNetworkCC:
+        """
+        Builds the NeuralNetworkCC object given a hyperparameters list.
+
+        :param hyperparameters: List
+
+        :return: NeuralNetworkCC
+        """
         return NeuralNetworkCC(
             self.__input_size,
             [hyperparameters[9]]
         )
 
     def build_learning_algorithm_object(self, hyperparameters: List) -> CascadeCorrelation:
+        """
+        Builds the CascadeCorrelation object given a hyperparameter list.
+
+        :param hyperparameters: List
+
+        :return: CascadeCorrelation
+        """
         return CascadeCorrelation(
             activation_function=hyperparameters[0],
             weights_initializer=hyperparameters[1],

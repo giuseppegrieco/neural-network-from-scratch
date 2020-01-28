@@ -24,6 +24,21 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
             minimal_correlation_increase: float,
             max_fails_increase: int
     ):
+        """
+        This is the constructor for the class CascadeCorrelation.
+
+        :param learning_rate: float
+        :param momentum: float
+        :param regularization_correlation: float
+        :param regularization_pseudo_inverse: float
+        :param activation_function: Function class
+        :param weights_initializer: WeightsInitializer
+        :param epochs: int
+        :param max_nodes: int
+        :param pool_size: int
+        :param minimal_correlation_increase: int
+        :param max_fails_increase: int
+        """
         super().__init__()
         self.__learning_rate = learning_rate
         self.__momentum = momentum
@@ -38,6 +53,14 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
         self.__max_fails_increase = max_fails_increase
 
     def train(self, neural_network: NeuralNetworkCC, X_train: np.mat, Y_train: np.mat):
+        """
+        Performs the train with cascade correlation learning algorithm.
+
+        :param neural_network: NeuralNetworkCC
+        :param X_train: np.mat
+        :param Y_train: np.mat
+        :return:
+        """
         super().train(neural_network, X_train, Y_train)
         self._stopped = False
         # Initializations
@@ -82,6 +105,17 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
             self._notify(neural_network, X_train, Y_train)
 
     def __candidate_unit(self, X_train, Y_train, current_input, last_output):
+        """
+        This method calculate a candidate units weights by maximizing the correlation, and returns
+        the hidden layer that contains that unit and the correlation calculated.
+
+        :param X_train: np.mat
+        :param Y_train: np.mat
+        :param current_input: np.mat
+        :param last_output: np.mat
+
+        :return: Layer, int
+        """
         # Creates the candidate units layer
         hidden_layer = Layer(
             1,
@@ -179,6 +213,15 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
         ), V_tot
 
     def __update_output_layer(self, output_layer: Layer, Y_train: np.mat, new_input):
+        """
+        Update the weights for the output layer by pseudo-inverse.
+
+        :param output_layer: Layer
+        :param Y_train: np.mat
+        :param new_input: np.mat
+
+        :return: np.mat
+        """
         pseudo_inverse = self.__pseudo_inverse(new_input).T
         new_weights = np.dot(
             Y_train,
@@ -191,6 +234,13 @@ class CascadeCorrelation(learning_algorithm.LearningAlgorithm):
         return last_output
 
     def __pseudo_inverse(self, Y_train):
+        """
+        Performs pseudo-inverse.
+
+        :param Y_train: np.mat
+
+        :return: np.mat
+        """
         return np.dot(np.linalg.inv(
             np.dot(
                 Y_train,

@@ -16,6 +16,16 @@ class GradientDescentTuningSpecs(TuningSpecs):
             regularization_list: List[float],
             epochs_list: List[int]
     ):
+        """
+        This is the constructor for the class GradientDescentTuningSpecs.
+
+        :param input_size: int
+        :param layers_list: List[List[Layer]]
+        :param learning_rate_list: List[float]
+        :param momentum_list: List[float]
+        :param regularization_list: List[Float]
+        :param epochs_list: List[int]
+        """
         self.__input_size = input_size
         self.__layers_list = layers_list
         self.__learning_rate_list = learning_rate_list
@@ -24,12 +34,26 @@ class GradientDescentTuningSpecs(TuningSpecs):
         self.__epochs_list = epochs_list
 
     def build_neural_network_object(self, hyperparameters) -> NeuralNetwork:
+        """
+        Builds the NeuralNetwork object given a hyperparameters list.
+
+        :param hyperparameters: List
+
+        :return: NeuralNetwork
+        """
         return NeuralNetwork(
             self.__input_size,
             hyperparameters[1]
         )
 
     def build_learning_algorithm_object(self, hyperparameters: List) -> GradientDescent:
+        """
+        Builds the GradientDescent object given a hyperparameter list.
+
+        :param hyperparameters: List
+
+        :return: GradientDescent
+        """
         return GradientDescent(
             epochs=hyperparameters[0],
             learning_rate=hyperparameters[2],
