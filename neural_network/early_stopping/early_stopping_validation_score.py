@@ -11,6 +11,11 @@ class EarlyStoppingValidationScore(EarlyStopping):
             self,
             max_fails: int
     ):
+        """
+        This is the constructor for the class EarlyStoppingValidationScore.
+
+        :param max_fails: int
+        """
         super().__init__()
         self.__max_fails = max_fails
         self.__fail_counter = 0
@@ -23,6 +28,16 @@ class EarlyStoppingValidationScore(EarlyStopping):
             X_train: np.mat,
             Y_train: np.mat
     ) -> None:
+        """
+        This checks if the validations is growing, and if the condition is satisfy for more than max fails indicated
+        the learning algorithm will be stopped.
+
+        :param learning_algorithm: LearningAlgorithm
+        :param neural_network: NeuralNetwork
+        :param X_train: np.mat
+        :param Y_train: np.mat
+        :return:
+        """
         if self._error_observer is not None and len(self._error_observer.store) > 0:
             new_error = self._error_observer.store[-1]
             if new_error < self.__minimum:

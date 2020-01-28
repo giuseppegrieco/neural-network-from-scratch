@@ -12,6 +12,11 @@ class EarlyStoppingMinimalIncrease(EarlyStopping):
             minimal_increase,
             max_fails
     ):
+        """
+        This is the constructor for the class EarlyStoppingMinimalIncrease.
+
+        :param max_fails: int
+        """
         super().__init__()
         self.__minimal_increase = minimal_increase
         self.__max_fails = max_fails
@@ -25,6 +30,16 @@ class EarlyStoppingMinimalIncrease(EarlyStopping):
             X_train: np.mat,
             Y_train: np.mat
     ) -> None:
+        """
+        This checks if the validation drops too slowly compared to a minimal increase factor indicated, if this happens
+        for a number of epochs greater than max fails then the learning algorithm will be stopped.
+
+        :param learning_algorithm: LearningAlgorithm
+        :param neural_network: NeuralNetwork
+        :param X_train: np.mat
+        :param Y_train: np.mat
+        :return:
+        """
         if self._error_observer is not None and len(self._error_observer.store) > 0:
             new_error = self._error_observer.store[-1]
             if self.__last_error - new_error < self.__last_error * self.__minimal_increase:
