@@ -1,3 +1,4 @@
+import csv
 import datetime
 import json
 import logging
@@ -8,15 +9,30 @@ import numpy as np
 
 from neural_network.early_stopping import EarlyStoppingMinimalIncrease, EarlyStoppingValidationScore
 from neural_network.functions import Sigmoid, Identity, MeanSquaredError, MeanEuclideanError
-from neural_network.hyperparameter_tuning import GridSearch, CascadeCorrelationTuningSpecs, GradientDescentTuningSpecs
+from neural_network.hyperparameter_tuning import GridSearch, CascadeCorrelationTuningSpecs
 from neural_network.layers import Layer, RandomNormalInitializer
-from neural_network.learning_algorithm import CascadeCorrelation
-from neural_network.learning_observer import ErrorObserver
 from neural_network.model_selection import KFoldCrossValidation
 
 import matplotlib.pyplot as plt
 
-from neural_network.neural_network_cc import NeuralNetworkCC
+def monk_parser(file_name, input_list, output_list):
+    index = 0
+    with open(file_name) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=' ')
+
+        for row in csv_reader:
+            value = [0] * 17
+            value[int(row[2]) - 1] = 1
+            value[3 + int(row[3]) - 1] = 1
+            value[6 + int(row[4]) - 1] = 1
+            value[8 + int(row[5]) - 1] = 1
+            value[11 + int(row[6]) - 1] = 1
+            value[15 + int(row[7]) - 1] = 1
+            input_list.append(value)
+            output_list.append(float(row[1]))
+            index = index + 1
+        csv_file.close()
+        return output_list
 
 
 def create_output_json(eta, lambda_reg, alpha_momentum, epochs, duration_in_sec, topology, path, average, variance):
@@ -53,59 +69,6 @@ def plotgraph(training_errors, validation_errors):
     subplot.plot(validation_errors, '--g', label='Validation')
     subplot.legend()
     plt.show()
-
-
-class DebugErrorObserverV(ErrorObserver):
-    def update(self, learning_algorithm) -> None:
-        super().update(learning_algorithm)
-        logging.debug('Validation MSE: %f' % self._store[-1])
-
-
-class DebugErrorObserverT(ErrorObserver):
-    def update(self, learning_algorithm) -> None:
-        super().update(learning_algorithm)
-        logging.debug('Training MSE: %f' % self._store[-1])
-
-
-def cascade():
-    w_init = RandomNormalInitializer()
-    TS = np.genfromtxt('cup/tr.csv', delimiter=',')
-
-    TS = TS[:, 1:]
-
-    X_train = TS[:1000, :-2].T
-    Y_train = TS[:1000, -2:].T
-
-    X_val = TS[1000:, :-2].T
-    Y_val = TS[1000:, -2:].T
-
-    my_nn = NeuralNetworkCC(
-        20,
-        [
-            Layer(2, Identity, w_init)
-        ]
-    )
-    cc = CascadeCorrelation(
-        learning_rate=0.0001,
-        momentum=0.6,
-        regularization_correlation=0.00001,
-        regularization_pseudo_inverse=0.001,
-        activation_function=Sigmoid,
-        weights_initializer=w_init,
-        epochs=15000,
-        max_nodes=50,
-        pool_size=15,
-        minimal_correlation_increase=0.0001,
-        max_fails_increase=100
-    )
-    e1 = DebugErrorObserverT(neural_network=my_nn, X=X_train, Y=Y_train, error_function=MeanSquaredError)
-    e2 = DebugErrorObserverV(neural_network=my_nn, X=X_val, Y=Y_val, error_function=MeanSquaredError)
-    cc.attach(e1)
-    cc.attach(e2)
-    cc.train(neural_network=my_nn, X_train=X_train, Y_train=Y_train)
-    plotgraph(e1.store, e2.store)
-    print(min(e2.store))
-    sys.exit(0)
 
 
 def create_timestamp_directory(path, prefix=''):  # todo: mettere secondo camnpo non obbligatiorio
