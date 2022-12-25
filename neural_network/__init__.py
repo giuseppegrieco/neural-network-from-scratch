@@ -1,30 +1,22 @@
-# -*- coding: utf-8 -*-
-"""
-This module contains all classes and functions required to build an
-Artificial Neural Network.
+import itertools
 
-Style Guide:
-http://google.github.io/styleguide/pyguide.html
-"""
-from .neural_network import NeuralNetwork
-from .layer import Layer
-from .activation_function import *
-from .gradient_descent import gradient_descent
-from .cascade_correlation import cascade_correlation
-from .utils import *
-from .grid_search import grid_search
+from neural_network.neural_network import NeuralNetwork
 
-# Import able to access:
-__all__ = [
-    'Layer',
-    'NeuralNetwork',
-    'gradient_descent',
-    'cascade_correlation',
-    'identity',
-    'tanh',
-    'sigmoid',
-    'convert_in_numpy',
-    'save_graph',
-    'utils',
-    'grid_search'
-]
+import neural_network.early_stopping as early_stopping
+import neural_network.functions as functions
+import neural_network.hyperparameter_tuning as hyperparameter_tuning
+import neural_network.layers as layers
+import neural_network.learning_algorithm as learning_algorithm
+import neural_network.learning_observer as learning_observer
+import neural_network.model_selection as model_selection
+
+__all__ = [x for x in itertools.chain(
+    ['NeuralNetwork', 'NeuralNetworkCC'],
+    early_stopping.__all__,
+    functions.__all__,
+    hyperparameter_tuning.__all__,
+    layers.__all__,
+    learning_algorithm.__all__,
+    learning_observer.__all__,
+    model_selection.__all__
+)]

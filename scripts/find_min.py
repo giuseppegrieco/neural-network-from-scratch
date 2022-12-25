@@ -9,13 +9,13 @@ min = sys.maxsize
 minDirectoryName = None
 all = None
 for directory in list:
-    if directory != '.DS_Store':
-        with open(file + directory + '/data.json', 'r') as myfile:
+    if directory != '.DS_Store' and directory != 'data.json':
+        with open(file + directory + '/result.json', 'r') as myfile:
             data = myfile.read()
 
         # parse file
         obj = json.loads(data)
-        average = float(obj['average'])
+        average = float(obj['mean'])
         if average < min:
             min = average
             minDirectoryName = directory
